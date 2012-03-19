@@ -1,6 +1,7 @@
 package net.ccar;
 
 import android.app.Activity;
+import android.content.pm.ActivityInfo;
 import android.graphics.PixelFormat;
 import android.hardware.Camera;
 import android.os.Bundle;
@@ -31,6 +32,7 @@ public class CameraView extends Activity implements SurfaceHolder.Callback {
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		
 		setContentView(R.layout.camera_view);
+		this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 		
 		mSurfaceView  = (SurfaceView) findViewById(R.id.surface);
 		mSurfaceHolder = mSurfaceView.getHolder();
