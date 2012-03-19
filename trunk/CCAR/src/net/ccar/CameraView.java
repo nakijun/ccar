@@ -10,6 +10,11 @@ import android.view.SurfaceView;
 import android.view.Window;
 import android.view.WindowManager;
 
+/**
+ * œ‡ª˙≈ƒ…„‘§¿¿
+ * @author swansword
+ * @createdate 2012-3-19
+ */
 public class CameraView extends Activity implements SurfaceHolder.Callback {
 	Camera mCamera;
 	private SurfaceView mSurfaceView;

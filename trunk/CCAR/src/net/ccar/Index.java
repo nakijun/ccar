@@ -8,8 +8,8 @@ import android.view.View.OnClickListener;
 
 /** 
  * 系统主界面 
- * 创建人：swansword
- * 创建日期：2012-3-19
+ * @author swansword
+ * @createdate 2012-3-19
  * */
 public class Index extends Activity implements OnClickListener {
     /** Called when the activity is first created. */
