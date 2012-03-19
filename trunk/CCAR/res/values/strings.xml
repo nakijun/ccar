@@ -3,7 +3,7 @@
 
     <string name="hello">Hello World, Index!</string>
     <string name="app_name">CCAR</string>
-    <string name="main_title">CCAR</string>
+    <string name="main_title">CCAR菜单界面</string>
 	<string name="btn_camera">相机测试</string>
 	
 	<color name="background">#000000</color>
