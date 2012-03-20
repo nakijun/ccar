@@ -26,7 +26,7 @@ public class Index extends Activity implements OnClickListener {
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.btnCamera:
-			Intent i = new Intent(this, CameraView.class);
+			Intent i = new Intent(this, CameraActivity.class);
 			startActivity(i);
 			break;
 		default:
