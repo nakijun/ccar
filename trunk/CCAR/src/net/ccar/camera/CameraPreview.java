@@ -5,6 +5,7 @@ import java.util.List;
 
 import android.content.Context;
 import android.hardware.Camera;
+import android.hardware.Camera.AutoFocusCallback;
 import android.hardware.Camera.Size;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -44,14 +45,25 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     }
 
     public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
+    	// 获取相机参数
         Camera.Parameters parameters = mCamera.getParameters();
 
+        // 将相机设置成自动调焦模式
+        parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+        
+        // 设置预览界面尺寸
         List<Size> sizes = parameters.getSupportedPreviewSizes();
         Size optimalSize = getOptimalPreviewSize(sizes, w, h);
         parameters.setPreviewSize(optimalSize.width, optimalSize.height);
 
+        // 设置相机参数并启动预览界面
         mCamera.setParameters(parameters);
         mCamera.startPreview();
+        
+        // 设置相机自动调焦
+        mCamera.autoFocus(new AutoFocusCallback() {
+			public void onAutoFocus(boolean success, Camera camera) {}
+		});
     }
 
     private Size getOptimalPreviewSize(List<Size> sizes, int w, int h) {
