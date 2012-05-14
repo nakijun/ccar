@@ -21,6 +21,10 @@
         	android:text="@string/btn_camera" 
         	android:layout_width="fill_parent"
         	android:layout_height="wrap_content" />
+	    <Button android:id="@+id/btnCanvas"
+	        android:text="@string/btn_canvas"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content" />
 	</LinearLayout>
     "
 </LinearLayout>

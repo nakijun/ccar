@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.Button;
 
 /** 
  * 系统主界面 
@@ -18,15 +19,22 @@ public class Index extends Activity implements OnClickListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         
-        View cameraButton = findViewById(R.id.btnCamera);
+        Button cameraButton = (Button) findViewById(R.id.btnCamera);
         cameraButton.setOnClickListener(this);
+        Button canvasButton = (Button) findViewById(R.id.btnCanvas);
+        canvasButton.setOnClickListener(this);
     }
 
 	@Override
 	public void onClick(View v) {
+		Intent i;
 		switch (v.getId()) {
 		case R.id.btnCamera:
-			Intent i = new Intent(this, CameraActivity.class);
+			i = new Intent(this, CameraActivity.class);
+			startActivity(i);
+			break;
+		case R.id.btnCanvas:
+			i = new Intent(this, CanvasActivity.class);
 			startActivity(i);
 			break;
 		default:

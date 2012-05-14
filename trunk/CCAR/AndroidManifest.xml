@@ -26,6 +26,10 @@
             android:label="@string/app_name"
             android:name=".CameraActivity">
         </activity>
+        <activity android:label="@string/app_name"
+            android:name=".CanvasActivity">
+            
+        </activity>
     </application>
 
 </manifest>
