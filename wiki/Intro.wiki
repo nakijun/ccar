@@ -10,13 +10,4 @@
 == 1.1编写目的 ==
 == 1.2项目背景 ==
 
-= 架构设计 =
-
-
-    # This is a numbered sublist
-    # Which is done by indenting further
-
-
-
-  # At the same levels
-  # As the above lists.
+= 2.架构设计 =
