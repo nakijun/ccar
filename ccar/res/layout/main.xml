@@ -1,14 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
+    android:orientation="horizontal"
+    android:padding="30dip"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    tools:context=".CCARActivity"
-    >
-<TextView  
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:text="@string/hello"
-    />
+    android:layout_height="fill_parent">
+    <LinearLayout 
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center">
+        <TextView 
+            android:layout_width="wrap_content"
+	    	android:layout_height="wrap_content"
+	    	android:layout_gravity="center"
+	    	android:layout_marginBottom="25dip"
+	    	android:textSize="24.5sp"
+	    	android:text="@string/index"/>
+		<Button android:id="@+id/spotlist_button"
+		    android:layout_width="fill_parent"
+		    android:layout_height="wrap_content"
+		    android:text="@string/spotlist"/>
+		<Button android:id="@+id/ar_button"
+		    android:layout_width="fill_parent"
+		    android:layout_height="wrap_content"
+		    android:text="@string/AR"/>
+		<Button android:id="@+id/navigation_button"
+		    android:layout_width="fill_parent"
+		    android:layout_height="wrap_content"
+		    android:text="@string/navigation"/>
+		<Button android:id="@+id/exit_button"
+		    android:layout_width="fill_parent"
+		    android:layout_height="wrap_content"
+		    android:text="@string/exit"/>
+    </LinearLayout>
+	
+    
 </LinearLayout>
+
