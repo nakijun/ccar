@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
@@ -61,15 +62,19 @@ public class MainActivity extends Activity implements OnClickListener {
 	 */
 	@Override
 	public void onClick(View v) {
+		Intent i;
 		switch (v.getId()) {
 		case R.id.spotlist_button:
-			Toast.makeText(this, "spotlist", Toast.LENGTH_SHORT).show();
+			i = new Intent(this, SpotListActivity.class);
+			startActivity(i);
 			break;
 		case R.id.ar_button:
-			Toast.makeText(this, "ar", Toast.LENGTH_SHORT).show();
+			i = new Intent(this, ARActivity.class);
+			startActivity(i);
 			break;
 		case R.id.navigation_button:
-			Toast.makeText(this, "navigation", Toast.LENGTH_SHORT).show();
+			i = new Intent(this, NavigationActivity.class);
+			startActivity(i);
 			break;
 		case R.id.exit_button:
 			exitApp();
