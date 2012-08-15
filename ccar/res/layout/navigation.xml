@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
     android:orientation="vertical" >
-    
+    <com.esri.android.map.MapView
+		android:id="@+id/map"
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+		initExtent = "1.3361896416108085E7, 3531393.0927731176, 1.3370502161535721E7, 3543978.995461035">
+	</com.esri.android.map.MapView>
 
 </LinearLayout>
