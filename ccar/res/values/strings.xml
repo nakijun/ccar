@@ -7,4 +7,5 @@
     <string name="spotlist">景点列表</string>
     <string name="AR">增强现实</string>
     <string name="navigation">景区导航</string>
+    <string name="spotinfo">景点信息</string>
 </resources>
