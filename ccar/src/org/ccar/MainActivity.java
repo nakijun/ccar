@@ -33,15 +33,7 @@ public class MainActivity extends Activity implements OnClickListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
-        // 设置各个按钮的监听器
-        btnSpotlist = (Button)findViewById(R.id.spotlist_button);
-        btnSpotlist.setOnClickListener(this);
-        btnAR = (Button)findViewById(R.id.ar_button);
-        btnAR.setOnClickListener(this);
-        btnNavigation = (Button)findViewById(R.id.navigation_button);
-        btnNavigation.setOnClickListener(this);
-        btnExit = (Button)findViewById(R.id.exit_button);
-        btnExit.setOnClickListener(this);
+        setListener(); // 设置各个按钮的监听器
     }
 
 	@Override 
@@ -93,6 +85,20 @@ public class MainActivity extends Activity implements OnClickListener {
 			exitApp();
 		}
 		return false;
+	}
+	
+	/**
+	 * 设置各按钮的监听器
+	 */
+	private void setListener() {
+		btnSpotlist = (Button)findViewById(R.id.spotlist_button);
+        btnSpotlist.setOnClickListener(this);
+        btnAR = (Button)findViewById(R.id.ar_button);
+        btnAR.setOnClickListener(this);
+        btnNavigation = (Button)findViewById(R.id.navigation_button);
+        btnNavigation.setOnClickListener(this);
+        btnExit = (Button)findViewById(R.id.exit_button);
+        btnExit.setOnClickListener(this);
 	}
 
 	/**
