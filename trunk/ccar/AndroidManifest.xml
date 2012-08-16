@@ -3,7 +3,13 @@
 	package="org.ccar"
     android:versionCode="1"
     android:versionName="1.0">
-    <uses-sdk android:minSdkVersion="8" />
+    <uses-sdk android:targetSdkVersion="10" 
+        android:minSdkVersion="8" />
+    
+    <uses-permission android:name="android.permission.INTERNET" />
+	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+	<uses-permission android:name="android.permission.CAMERA" />
 
 	<uses-feature android:glEsVersion="0x00020000" android:required="true"/> 
 	<uses-feature android:name="android.hardware.camera" />
@@ -24,10 +30,8 @@
 		    	  android:label="@string/AR"></activity>
 		<activity android:name=".NavigationActivity"
 		    	  android:label="@string/navigation"></activity>
+		<activity android:name=".SpotInfoActivity"
+		    	  android:label="@string/spotinfo"></activity>
     </application>
 
-<uses-permission android:name="android.permission.INTERNET" />
-<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-<uses-permission android:name="android.permission.CAMERA" />
 </manifest>
