@@ -27,7 +27,8 @@
 		<activity android:name=".SpotListActivity"
 		    	  android:label="@string/spotlist"></activity>
 		<activity android:name=".ARActivity"
-		    	  android:label="@string/AR"></activity>
+		    	  android:label="@string/AR"
+		    	  android:screenOrientation="landscape"></activity>
 		<activity android:name=".NavigationActivity"
 		    	  android:label="@string/navigation"></activity>
 		<activity android:name=".SpotInfoActivity"
