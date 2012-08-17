@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="hello">Hello World, CCARActivity!</string>
     <string name="app_name">ccar</string>
     <string name="index">首页</string>
     <string name="exit">退出</string>
@@ -8,4 +7,6 @@
     <string name="AR">增强现实</string>
     <string name="navigation">景区导航</string>
     <string name="spotinfo">景点信息</string>
+    <string name="mkdirs_error">创建目录失败！</string>
+    <string name="copy_database_error">拷贝数据库文件失败！</string>
 </resources>
