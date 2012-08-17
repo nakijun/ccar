@@ -1,47 +1,63 @@
 package org.ccar;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Date;
+
+import org.ccar.app.CCARApplication;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.Toast;
 
 /**
  * 主页
+ * 
  * @author swansword
  * 
  */
 public class MainActivity extends Activity implements OnClickListener {
-	Button btnSpotlist; 	// “景点列表”按钮
-	Button btnAR;			// “增强现实”按钮
-	Button btnNavigation;	// “景区导航”按钮
-	Button btnExit;			// “退出”按钮
-	
-    /** Called when the activity is first created. */
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
+	Button btnSpotlist; // “景点列表”按钮
+	Button btnAR; // “增强现实”按钮
+	Button btnNavigation; // “景区导航”按钮
+	Button btnExit; // “退出”按钮
 
-        setListener(); // 设置各个按钮的监听器
-    }
+	/** Called when the activity is first created. */
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.main);
 
-	@Override 
-	protected void onDestroy() { 
+		copyDatabase(); // 拷贝数据库文件，将数据库文件从 assets 目录拷贝到 sd 卡中。
+		setListener(); // 设置各个按钮的监听器
+	}
+
+	@Override
+	protected void onDestroy() {
 		super.onDestroy();
 	}
+
 	@Override
 	protected void onPause() {
 		super.onPause();
 	}
-	@Override 	
+
+	@Override
 	protected void onResume() {
-		super.onResume(); 
+		super.onResume();
 	}
 
 	/**
@@ -70,7 +86,7 @@ public class MainActivity extends Activity implements OnClickListener {
 			break;
 		}
 	}
-	
+
 	/**
 	 * 按回退键退出应用程序
 	 */
@@ -81,19 +97,71 @@ public class MainActivity extends Activity implements OnClickListener {
 		}
 		return false;
 	}
-	
+
+	/**
+	 * 拷贝数据库文件，将数据库文件从 assets 目录拷贝到 sd 卡中。
+	 * 
+	 * @return 是否拷贝成功。
+	 */
+	private boolean copyDatabase() {
+
+		// 获取 CCAR 应用程序。
+		CCARApplication ccarApplication = (CCARApplication) getApplication();
+
+		// sd 卡中的数据库文件路径，不存在则创建.
+		String dbPath = Environment.getExternalStorageDirectory() + "/"
+				+ ccarApplication.getDbPath();
+		File path = new File(dbPath);
+		if (!path.exists() && !path.mkdirs()) {
+			Toast.makeText(this, R.string.mkdirs_error, Toast.LENGTH_SHORT)
+					.show();
+			return false;
+		}
+
+		// sd 卡中的数据库文件，不存在则进行拷贝。
+		String dbFile = dbPath + "/" + ccarApplication.getDbFile();
+		File file = new File(dbFile);
+		if (!file.exists()) {
+			try {
+				// 打开 assets 目录中的数据库文件。
+				InputStream inputStream = getResources().getAssets().open(
+						ccarApplication.getDbFile());
+
+				// 将数据库文件拷贝到 sd 卡中。
+				OutputStream outputStream = new FileOutputStream(file);
+				byte[] buffer = new byte[1024];
+				int length;
+				while ((length = inputStream.read(buffer)) > 0) {
+					outputStream.write(buffer, 0, length);
+				}
+				outputStream.flush();
+
+				// 关闭文件。
+				outputStream.close();
+				inputStream.close();
+			} catch (IOException e) {
+				Toast.makeText(this, R.string.copy_database_error,
+						Toast.LENGTH_SHORT).show();
+				e.printStackTrace();
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 	/**
 	 * 设置各按钮的监听器
 	 */
 	private void setListener() {
-		btnSpotlist = (Button)findViewById(R.id.spotlist_button);
-        btnSpotlist.setOnClickListener(this);
-        btnAR = (Button)findViewById(R.id.ar_button);
-        btnAR.setOnClickListener(this);
-        btnNavigation = (Button)findViewById(R.id.navigation_button);
-        btnNavigation.setOnClickListener(this);
-        btnExit = (Button)findViewById(R.id.exit_button);
-        btnExit.setOnClickListener(this);
+		btnSpotlist = (Button) findViewById(R.id.spotlist_button);
+		btnSpotlist.setOnClickListener(this);
+		btnAR = (Button) findViewById(R.id.ar_button);
+		btnAR.setOnClickListener(this);
+		btnNavigation = (Button) findViewById(R.id.navigation_button);
+		btnNavigation.setOnClickListener(this);
+		btnExit = (Button) findViewById(R.id.exit_button);
+		btnExit.setOnClickListener(this);
 	}
 
 	/**
