@@ -24,7 +24,7 @@ public class CCARApplication extends Application {
 	/**
 	 * 获取数据库文件名称。
 	 * 
-	 * @return 数据文件库名称。
+	 * @return 数据库文件名称。
 	 */
 	public String getDbFile() {
 		return dbFile;
