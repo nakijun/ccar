@@ -37,7 +37,7 @@ public class CCARApplication extends Application {
 	 */
 	public String getDbPath() {
 		if (dbPath == null) {
-			dbPath = Environment.getDataDirectory() + "/data/" + getPackageName() + "/" + dbFile;
+			dbPath = Environment.getDataDirectory() + "/data/" + getPackageName() + "/databases/" + dbFile;
 		}
 		return dbPath;
 	}
