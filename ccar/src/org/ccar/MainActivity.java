@@ -41,7 +41,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
-		copyDatabase(); // 拷贝数据库文件，将数据库文件从 assets 目录拷贝到 sd 卡中。
+		copyDatabase(); // 拷贝数据库文件，将数据库文件从 assets 目录拷贝到手机内存中。
 		setListener(); // 设置各个按钮的监听器
 	}
 
@@ -99,7 +99,7 @@ public class MainActivity extends Activity implements OnClickListener {
 	}
 
 	/**
-	 * 拷贝数据库文件，将数据库文件从 assets 目录拷贝到 sd 卡中。
+	 * 拷贝数据库文件，将数据库文件从 assets 目录拷贝到手机内存中。
 	 * 
 	 * @return 是否拷贝成功。
 	 */
@@ -107,27 +107,17 @@ public class MainActivity extends Activity implements OnClickListener {
 
 		// 获取 CCAR 应用程序。
 		CCARApplication ccarApplication = (CCARApplication) getApplication();
-
-		// sd 卡中的数据库文件路径，不存在则创建.
-		String dbPath = Environment.getExternalStorageDirectory() + "/"
-				+ ccarApplication.getDbPath();
-		File path = new File(dbPath);
-		if (!path.exists() && !path.mkdirs()) {
-			Toast.makeText(this, R.string.mkdirs_error, Toast.LENGTH_SHORT)
-					.show();
-			return false;
-		}
-
-		// sd 卡中的数据库文件，不存在则进行拷贝。
-		String dbFile = dbPath + "/" + ccarApplication.getDbFile();
-		File file = new File(dbFile);
+		
+		// 如果数据库文件不存在，则拷贝。
+		String dbPath = ccarApplication.getDbPath();
+		File file = new File(dbPath);
 		if (!file.exists()) {
 			try {
 				// 打开 assets 目录中的数据库文件。
 				InputStream inputStream = getResources().getAssets().open(
 						ccarApplication.getDbFile());
 
-				// 将数据库文件拷贝到 sd 卡中。
+				// 将数据库文件拷贝到手机内存中。
 				OutputStream outputStream = new FileOutputStream(file);
 				byte[] buffer = new byte[1024];
 				int length;
