@@ -1,13 +1,5 @@
 package org.ccar;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Date;
-
 import org.ccar.app.CCARApplication;
 
 import android.app.Activity;
@@ -16,12 +8,10 @@ import android.app.AlertDialog.Builder;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Environment;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
-import android.widget.Toast;
 
 /**
  * 主页
@@ -41,13 +31,16 @@ public class MainActivity extends Activity implements OnClickListener {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
-		copyDatabase(); // 拷贝数据库文件，将数据库文件从 assets 目录拷贝到手机内存中。
 		setListener(); // 设置各个按钮的监听器
 	}
 
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
+		
+		// 关闭数据库。
+		CCARApplication ccarApplication = (CCARApplication) getApplication();
+		ccarApplication.getDatabaseManager().closeDatabase();
 	}
 
 	@Override
@@ -96,48 +89,6 @@ public class MainActivity extends Activity implements OnClickListener {
 			exitApp();
 		}
 		return false;
-	}
-
-	/**
-	 * 拷贝数据库文件，将数据库文件从 assets 目录拷贝到手机内存中。
-	 * 
-	 * @return 是否拷贝成功。
-	 */
-	private boolean copyDatabase() {
-
-		// 获取 CCAR 应用程序。
-		CCARApplication ccarApplication = (CCARApplication) getApplication();
-		
-		// 如果数据库文件不存在，则拷贝。
-		String dbPath = ccarApplication.getDbPath();
-		File file = new File(dbPath);
-		if (!file.exists()) {
-			try {
-				// 打开 assets 目录中的数据库文件。
-				InputStream inputStream = getResources().getAssets().open(
-						ccarApplication.getDbFile());
-
-				// 将数据库文件拷贝到手机内存中。
-				OutputStream outputStream = new FileOutputStream(file);
-				byte[] buffer = new byte[1024];
-				int length;
-				while ((length = inputStream.read(buffer)) > 0) {
-					outputStream.write(buffer, 0, length);
-				}
-				outputStream.flush();
-
-				// 关闭文件。
-				outputStream.close();
-				inputStream.close();
-			} catch (IOException e) {
-				Toast.makeText(this, R.string.copy_database_error,
-						Toast.LENGTH_SHORT).show();
-				e.printStackTrace();
-				return false;
-			}
-		}
-
-		return true;
 	}
 
 	/**
