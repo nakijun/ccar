@@ -128,12 +128,12 @@ public class DatabaseManager {
 				"select * from t_scenicspot", null);
 		while (cursor.moveToNext()) {
 			ScenicSpot scenicSpot = new ScenicSpot();
-			scenicSpot.ID = cursor.getInt(cursor.getColumnIndex("ID"));
-			scenicSpot.Name = cursor.getString(cursor.getColumnIndex("Name"));
-			scenicSpot.Description = cursor.getString(cursor
-					.getColumnIndex("Description"));
-			scenicSpot.X = cursor.getDouble(cursor.getColumnIndex("X"));
-			scenicSpot.Y = cursor.getDouble(cursor.getColumnIndex("Y"));
+			scenicSpot.setID(cursor.getInt(cursor.getColumnIndex("ID")));
+			scenicSpot.setName(cursor.getString(cursor.getColumnIndex("Name")));
+			scenicSpot.setDescription(cursor.getString(cursor
+					.getColumnIndex("Description")));
+			scenicSpot.setX(cursor.getDouble(cursor.getColumnIndex("X")));
+			scenicSpot.setY(cursor.getDouble(cursor.getColumnIndex("Y")));
 			scenicSpots.add(scenicSpot);
 		}
 		cursor.close();
