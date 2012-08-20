@@ -10,4 +10,6 @@
     <string name="mkdirs_error">创建目录失败！</string>
     <string name="copy_database_error">拷贝数据库文件失败！</string>
     <string name="database_not_initialized">数据库尚未初始化！</string>
+    <string name="symbol_zoomin">+</string>
+    <string name="symbol_zoomout">-</string>
 </resources>
