@@ -22,11 +22,11 @@ import android.widget.Toast;
  * 
  */
 public class DatabaseManager {
-	
+
 	/**
 	 * 用于打开数据库的上下文。
 	 */
-	private Context ctx;
+	private Context context;
 
 	/**
 	 * 数据库文件。
@@ -44,6 +44,30 @@ public class DatabaseManager {
 	private boolean initialized;
 
 	/**
+	 * 指示排序优先级，默认为距离优先。
+	 */
+	private OrderPriority orderPriority = OrderPriority.Distance;
+
+	/**
+	 * 获取排序优先级。
+	 * 
+	 * @return 排序优先级。
+	 */
+	public OrderPriority getOrderPriority() {
+		return orderPriority;
+	}
+
+	/**
+	 * 设置排序优先级。
+	 * 
+	 * @param orderPriority
+	 *            将排序优先级设置为该值。
+	 */
+	public void setOrderPriority(OrderPriority orderPriority) {
+		this.orderPriority = orderPriority;
+	}
+
+	/**
 	 * 构造函数。
 	 * 
 	 * @param context
@@ -52,9 +76,9 @@ public class DatabaseManager {
 	 *            数据库名称。
 	 */
 	public DatabaseManager(Context context) {
-		ctx = context;
+		this.context = context;
 		if (copyDatabase()) {
-			dbHelper = new DatabaseHelper(ctx, dbFile);
+			dbHelper = new DatabaseHelper(context, dbFile);
 			initialized = true;
 		}
 	}
@@ -68,10 +92,10 @@ public class DatabaseManager {
 
 		// 如果数据库目录不存在，则创建。
 		String dbPath = Environment.getDataDirectory() + "/data/"
-				+ ctx.getPackageName() + "/databases";
+				+ context.getPackageName() + "/databases";
 		File path = new File(dbPath);
 		if (!path.exists() && !path.mkdirs()) {
-			Toast.makeText(ctx, R.string.mkdirs_error, Toast.LENGTH_SHORT)
+			Toast.makeText(context, R.string.mkdirs_error, Toast.LENGTH_SHORT)
 					.show();
 			return false;
 		}
@@ -82,7 +106,7 @@ public class DatabaseManager {
 		if (!file.exists()) {
 			try {
 				// 打开 assets 目录中的数据库文件。
-				InputStream inputStream = ctx.getResources().getAssets()
+				InputStream inputStream = context.getResources().getAssets()
 						.open("data.db");
 
 				// 将数据库文件拷贝到手机内存中。
@@ -98,7 +122,7 @@ public class DatabaseManager {
 				outputStream.close();
 				inputStream.close();
 			} catch (IOException e) {
-				Toast.makeText(ctx, R.string.copy_database_error,
+				Toast.makeText(context, R.string.copy_database_error,
 						Toast.LENGTH_SHORT).show();
 				e.printStackTrace();
 				return false;
@@ -110,36 +134,97 @@ public class DatabaseManager {
 	}
 
 	/**
-	 * 获取所有景点。
+	 * 获取指定 ID 的景点记录。
 	 * 
-	 * @return 所有景点。
+	 * @param id
+	 *            景点的 ID。
+	 * @return 指定 ID 的景点记录。
+	 */
+	public ScenicSpot getScenicSpot(int id) {
+		if (!initialized) {
+			Toast.makeText(context, R.string.database_not_initialized,
+					Toast.LENGTH_SHORT).show();
+		}
+
+		ScenicSpot scenicSpot = null;
+		Cursor cursor = dbHelper.getReadableDatabase().rawQuery(
+				"select * from t_scenicspot where id = ?",
+				new String[] { String.valueOf(id) });
+		if (cursor.moveToNext()) {
+			scenicSpot = constructInstance(cursor);
+		}
+		cursor.close();
+		return scenicSpot;
+	}
+
+	/**
+	 * 获取所有景点记录。
+	 * 
+	 * @return 所有景点记录。
 	 */
 	public List<ScenicSpot> getScenicSpots() {
-
 		if (!initialized) {
-			Toast.makeText(ctx, R.string.database_not_initialized,
+			Toast.makeText(context, R.string.database_not_initialized,
 					Toast.LENGTH_SHORT).show();
 		}
 
 		ArrayList<ScenicSpot> scenicSpots = new ArrayList<ScenicSpot>();
-
-		// 查询
 		Cursor cursor = dbHelper.getReadableDatabase().rawQuery(
-				"select * from t_scenicspot", null);
+				"select * from t_scenicspot order by ?", new String[] { "id" });
 		while (cursor.moveToNext()) {
-			ScenicSpot scenicSpot = new ScenicSpot();
-			scenicSpot.setID(cursor.getInt(cursor.getColumnIndex("ID")));
-			scenicSpot.setName(cursor.getString(cursor.getColumnIndex("Name")));
-			scenicSpot.setDescription(cursor.getString(cursor
-					.getColumnIndex("Description")));
-			scenicSpot.setX(cursor.getDouble(cursor.getColumnIndex("X")));
-			scenicSpot.setY(cursor.getDouble(cursor.getColumnIndex("Y")));
+			ScenicSpot scenicSpot = constructInstance(cursor);
 			scenicSpots.add(scenicSpot);
 		}
 		cursor.close();
-
 		return scenicSpots;
+	}
 
+	/**
+	 * 获取从指定位置开始指定条数的景点记录。
+	 * 
+	 * @param offset
+	 *            指定位置。
+	 * @param limit
+	 *            指定条数。
+	 * @return 从指定位置开始指定条数的景点记录。
+	 */
+	public List<ScenicSpot> getScenicSpots(int offset, int limit) {
+		if (!initialized) {
+			Toast.makeText(context, R.string.database_not_initialized,
+					Toast.LENGTH_SHORT).show();
+		}
+
+		ArrayList<ScenicSpot> scenicSpots = new ArrayList<ScenicSpot>();
+		Cursor cursor = dbHelper.getReadableDatabase().rawQuery(
+				"select * from t_scenicspot order by ? limit ? offset ?",
+				new String[] { "id", String.valueOf(limit),
+						String.valueOf(offset) });
+		while (cursor.moveToNext()) {
+			ScenicSpot scenicSpot = constructInstance(cursor);
+			scenicSpots.add(scenicSpot);
+		}
+		cursor.close();
+		return scenicSpots;
+	}
+
+	/**
+	 * 从 Cursor 构造景点实例。
+	 * 
+	 * @param cursor
+	 *            用于构造景点实例的 Cursor。
+	 * @return 景点实例。
+	 */
+	private ScenicSpot constructInstance(Cursor cursor) {
+		ScenicSpot scenicSpot = new ScenicSpot();
+		scenicSpot.setID(cursor.getInt(cursor.getColumnIndex("ID")));
+		scenicSpot.setName(cursor.getString(cursor.getColumnIndex("Name")));
+		scenicSpot.setDescription(cursor.getString(cursor
+				.getColumnIndex("Description")));
+		scenicSpot.setLon(cursor.getDouble(cursor.getColumnIndex("Lon")));
+		scenicSpot.setLat(cursor.getDouble(cursor.getColumnIndex("Lat")));
+		scenicSpot.setX(cursor.getDouble(cursor.getColumnIndex("X")));
+		scenicSpot.setY(cursor.getDouble(cursor.getColumnIndex("Y")));
+		return scenicSpot;
 	}
 
 	/**
