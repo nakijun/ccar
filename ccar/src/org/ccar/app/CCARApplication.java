@@ -1,10 +1,11 @@
 package org.ccar.app;
 
+import org.ccar.data.DatabaseManager;
+
 import android.app.Application;
-import android.os.Environment;
 
 /**
- * CCAR 应用程序
+ * CCAR 应用程序。
  * 
  * @author FG
  * 
@@ -12,38 +13,25 @@ import android.os.Environment;
 public class CCARApplication extends Application {
 
 	/**
-	 * 数据库文件名称。
+	 * 数据库管理类。
 	 */
-	private String dbFile = "data.db";
+	private DatabaseManager dbManager;
 
 	/**
-	 * 数据库文件路径。
-	 */
-	private String dbPath = null;
-
-	/**
-	 * 获取数据库文件名称。
+	 * 获取数据库管理类。
 	 * 
-	 * @return 数据库文件名称。
+	 * @return 数据库管理类。
 	 */
-	public String getDbFile() {
-		return dbFile;
-	}
-
-	/**
-	 * 获取数据库文件路径。
-	 * 
-	 * @return 数据库文件路径。
-	 */
-	public String getDbPath() {
-		if (dbPath == null) {
-			dbPath = Environment.getDataDirectory() + "/data/" + getPackageName() + "/databases/" + dbFile;
+	public DatabaseManager getDatabaseManager() {
+		if (dbManager == null) {
+			dbManager = new DatabaseManager(this);
 		}
-		return dbPath;
+		return dbManager;
 	}
 
 	@Override
 	public void onCreate() {
 		super.onCreate();
 	}
+
 }
