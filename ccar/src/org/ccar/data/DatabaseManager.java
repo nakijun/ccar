@@ -355,6 +355,8 @@ public class DatabaseManager {
 			}
 			cursor.close();
 		} catch (Exception e) {
+			Toast.makeText(context, "更新数据库出错！",
+					Toast.LENGTH_SHORT).show();
 			e.printStackTrace();
 		}
 	}
