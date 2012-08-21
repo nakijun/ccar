@@ -1,0 +1,17 @@
+#summary One-sentence summary of this page.
+
+= 数据结构 =
+*景点（T_ScenicSpot）
+|| *字段名称* || *中文名称* || *类型（长度）* || *描述* ||
+|| ID || ID || INTEGER ||  ||
+|| Code || 代码 || TEXT(10) ||  ||
+|| Name || 名称 || TEXT(100) ||  ||
+|| Description || 描述 || TEXT(200) ||  ||
+|| RoadID || 道路ID || INTEGER ||  ||
+|| ImageFiles || 图像文件 || TEXT(50) || 以"-"隔开 ||
+|| AudioFiles || 音频文件 || TEXT(50) || 以"-"隔开 ||
+|| Remark || 备注 || TEXT(50) ||  ||
+|| Lon || 经度 || REAL(15,8) ||  ||
+|| Lat || 纬度 || REAL(15,8) ||  ||
+|| X || X坐标 || REAL(15,8) ||  ||
+|| Y || Y坐标 || REAL(15,8) ||  ||
