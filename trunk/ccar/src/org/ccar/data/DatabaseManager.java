@@ -9,9 +9,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.ccar.R;
+import org.ccar.app.GeoCalcUtil;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
 import android.widget.Toast;
 
@@ -205,7 +208,7 @@ public class DatabaseManager {
 		if (x != null && y != null) {
 			hasDistance = true;
 			sql = sql + ", (x - " + x + ") * (x - " + x + ") + (y - " + y
-					+ ") * (y - " + y + ") as sd";
+					+ ") * (y - " + y + ") as sod";
 		}
 		sql = sql + " from t_scenicspot";
 		String[] selectionArgs = null;
@@ -252,7 +255,7 @@ public class DatabaseManager {
 		if (x != null && y != null) {
 			hasDistance = true;
 			sql = sql + ", (x - " + x + ") * (x - " + x + ") + (y - " + y
-					+ ") * (y - " + y + ") as sd";
+					+ ") * (y - " + y + ") as sod";
 		}
 		sql = sql + " from t_scenicspot";
 		String[] selectionArgs = null;
@@ -319,11 +322,9 @@ public class DatabaseManager {
 				.getColumnIndex("Description")));
 		scenicSpot.setLon(cursor.getDouble(cursor.getColumnIndex("Lon")));
 		scenicSpot.setLat(cursor.getDouble(cursor.getColumnIndex("Lat")));
-		scenicSpot.setX(cursor.getDouble(cursor.getColumnIndex("X")));
-		scenicSpot.setY(cursor.getDouble(cursor.getColumnIndex("Y")));
 		if (hasDistance) {
 			scenicSpot.setDistance(Math.sqrt(cursor.getDouble(cursor
-					.getColumnIndex("sd"))));
+					.getColumnIndex("sod"))));
 		}
 		return scenicSpot;
 	}
@@ -332,7 +333,30 @@ public class DatabaseManager {
 	 * ¹Ø±ÕÊý¾Ý¿â¡£
 	 */
 	public void closeDatabase() {
+		updateDatabase();
 		dbHelper.close();
+	}
+
+	public void updateDatabase() {
+		try {
+			SQLiteDatabase database = dbHelper.getWritableDatabase();
+			String sql = "select * from t_scenicspot order by name";
+			Cursor cursor = database.rawQuery(sql, null);
+			while (cursor.moveToNext()) {
+				int id = cursor.getInt(cursor.getColumnIndex("ID"));
+				double lon = cursor.getDouble(cursor.getColumnIndex("Lon"));
+				double lat = cursor.getDouble(cursor.getColumnIndex("Lat"));
+				double[] xy = GeoCalcUtil.WGS2flat(lon, lat);
+				ContentValues cv = new ContentValues();
+				cv.put("X", xy[0]);
+				cv.put("Y", xy[1]);
+				database.update("t_scenicspot", cv, "id = ?",
+						new String[] { String.valueOf(id) });
+			}
+			cursor.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 }
