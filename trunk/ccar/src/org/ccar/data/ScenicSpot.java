@@ -176,4 +176,28 @@ public class ScenicSpot {
 		this.y = y;
 	}
 
+	/**
+	 * 景点与当前位置的距离。
+	 */
+	private Double distance;
+	
+	/**
+	 * 获取景点与当前位置的距离。
+	 * 
+	 * @return 景点与当前位置的距离。
+	 */
+	public Double getDistance() {
+		return distance;
+	}
+
+	/**
+	 * 设置景点与当前位置的距离。
+	 * 
+	 * @param distance
+	 *            将景点与当前位置的距离设置为该值。
+	 */
+	public void setDistance(Double distance) {
+		this.distance = distance;
+	}
+
 }

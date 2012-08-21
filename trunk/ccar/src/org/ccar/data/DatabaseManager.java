@@ -44,30 +44,6 @@ public class DatabaseManager {
 	private boolean initialized;
 
 	/**
-	 * 指示排序优先级，默认为距离优先。
-	 */
-	private OrderPriority orderPriority = OrderPriority.Distance;
-
-	/**
-	 * 获取排序优先级。
-	 * 
-	 * @return 排序优先级。
-	 */
-	public OrderPriority getOrderPriority() {
-		return orderPriority;
-	}
-
-	/**
-	 * 设置排序优先级。
-	 * 
-	 * @param orderPriority
-	 *            将排序优先级设置为该值。
-	 */
-	public void setOrderPriority(OrderPriority orderPriority) {
-		this.orderPriority = orderPriority;
-	}
-
-	/**
 	 * 构造函数。
 	 * 
 	 * @param context
@@ -151,7 +127,7 @@ public class DatabaseManager {
 				"select * from t_scenicspot where id = ?",
 				new String[] { String.valueOf(id) });
 		if (cursor.moveToNext()) {
-			scenicSpot = constructInstance(cursor);
+			scenicSpot = constructInstance(cursor, false);
 		}
 		cursor.close();
 		return scenicSpot;
@@ -169,10 +145,10 @@ public class DatabaseManager {
 		}
 
 		ArrayList<ScenicSpot> scenicSpots = new ArrayList<ScenicSpot>();
-		Cursor cursor = dbHelper.getReadableDatabase().rawQuery(
-				"select * from t_scenicspot order by ?", new String[] { "id" });
+		String sql = "select * from t_scenicspot order by name";
+		Cursor cursor = dbHelper.getReadableDatabase().rawQuery(sql, null);
 		while (cursor.moveToNext()) {
-			ScenicSpot scenicSpot = constructInstance(cursor);
+			ScenicSpot scenicSpot = constructInstance(cursor, false);
 			scenicSpots.add(scenicSpot);
 		}
 		cursor.close();
@@ -195,12 +171,11 @@ public class DatabaseManager {
 		}
 
 		ArrayList<ScenicSpot> scenicSpots = new ArrayList<ScenicSpot>();
-		Cursor cursor = dbHelper.getReadableDatabase().rawQuery(
-				"select * from t_scenicspot order by ? limit ? offset ?",
-				new String[] { "id", String.valueOf(limit),
-						String.valueOf(offset) });
+		String sql = "select * from t_scenicspot order by name limit "
+				+ String.valueOf(limit) + " offset " + String.valueOf(offset);
+		Cursor cursor = dbHelper.getReadableDatabase().rawQuery(sql, null);
 		while (cursor.moveToNext()) {
-			ScenicSpot scenicSpot = constructInstance(cursor);
+			ScenicSpot scenicSpot = constructInstance(cursor, false);
 			scenicSpots.add(scenicSpot);
 		}
 		cursor.close();
@@ -208,13 +183,135 @@ public class DatabaseManager {
 	}
 
 	/**
+	 * 根据景点的名称以及当前位置获取所有符合条件景点记录。
+	 * 
+	 * @param name
+	 *            景点的名称。
+	 * @param x
+	 *            当前位置的 X 坐标。
+	 * @param y
+	 *            当前位置的 Y 坐标。
+	 * @return 所有符合条件景点记录。
+	 */
+	public List<ScenicSpot> getScenicSpots(String name, String x, String y) {
+		if (!initialized) {
+			Toast.makeText(context, R.string.database_not_initialized,
+					Toast.LENGTH_SHORT).show();
+		}
+
+		ArrayList<ScenicSpot> scenicSpots = new ArrayList<ScenicSpot>();
+		boolean hasDistance = false;
+		String sql = "select *";
+		if (x != null && y != null) {
+			hasDistance = true;
+			sql = sql + ", (x - " + x + ") * (x - " + x + ") + (y - " + y
+					+ ") * (y - " + y + ") as sd";
+		}
+		sql = sql + " from t_scenicspot";
+		String[] selectionArgs = null;
+		if (name != null) {
+			sql = sql + " where name = ?";
+			selectionArgs = new String[] { name };
+		}
+		sql = sql + " order by " + getOrderBy(name, x, y);
+		Cursor cursor = dbHelper.getReadableDatabase().rawQuery(sql,
+				selectionArgs);
+		while (cursor.moveToNext()) {
+			ScenicSpot scenicSpot = constructInstance(cursor, hasDistance);
+			scenicSpots.add(scenicSpot);
+		}
+		cursor.close();
+		return scenicSpots;
+	}
+
+	/**
+	 * 根据景点的名称以及当前位置获取符合条件的从指定位置开始指定条数的景点记录。
+	 * 
+	 * @param name
+	 *            景点的名称。
+	 * @param x
+	 *            当前位置的 X 坐标。
+	 * @param y
+	 *            当前位置的 Y 坐标。
+	 * @param offset
+	 *            指定位置。
+	 * @param limit
+	 *            指定条数。
+	 * @return 符合条件的从指定位置开始指定条数的景点记录。
+	 */
+	public List<ScenicSpot> getScenicSpots(String name, String x, String y,
+			int offset, int limit) {
+		if (!initialized) {
+			Toast.makeText(context, R.string.database_not_initialized,
+					Toast.LENGTH_SHORT).show();
+		}
+
+		ArrayList<ScenicSpot> scenicSpots = new ArrayList<ScenicSpot>();
+		boolean hasDistance = false;
+		String sql = "select *";
+		if (x != null && y != null) {
+			hasDistance = true;
+			sql = sql + ", (x - " + x + ") * (x - " + x + ") + (y - " + y
+					+ ") * (y - " + y + ") as sd";
+		}
+		sql = sql + " from t_scenicspot";
+		String[] selectionArgs = null;
+		if (name != null) {
+			sql = sql + " where name = ?";
+			selectionArgs = new String[] { name };
+		}
+		sql = sql + " order by " + getOrderBy(name, x, y);
+		sql = sql + " limit " + String.valueOf(limit) + " offset "
+				+ String.valueOf(offset);
+		Cursor cursor = dbHelper.getReadableDatabase().rawQuery(sql,
+				selectionArgs);
+		while (cursor.moveToNext()) {
+			ScenicSpot scenicSpot = constructInstance(cursor, hasDistance);
+			scenicSpots.add(scenicSpot);
+		}
+		cursor.close();
+		return scenicSpots;
+	}
+
+	/**
+	 * 根据景点的名称以及当前位置获取 order by 语句。
+	 * 
+	 * @param name
+	 *            景点的名称。
+	 * @param x
+	 *            当前位置的 X 坐标。
+	 * @param y
+	 *            当前位置的 Y 坐标。
+	 * @return order by 语句。
+	 */
+	private String getOrderBy(String name, String x, String y) {
+		String orderby = null;
+		if (name != null) {
+			orderby = "name";
+		}
+		if (x != null && y != null) {
+			if (orderby == null) {
+				orderby = orderby + ", ";
+			}
+			orderby = orderby + "(x - " + x + ") * (x - " + x + ") + (y - " + y
+					+ ") * (y - " + y + ")";
+		}
+		if (orderby == null) {
+			orderby = "name";
+		}
+		return orderby;
+	}
+
+	/**
 	 * 从 Cursor 构造景点实例。
 	 * 
 	 * @param cursor
 	 *            用于构造景点实例的 Cursor。
+	 * @param hasDistance
+	 *            是否存在距离。
 	 * @return 景点实例。
 	 */
-	private ScenicSpot constructInstance(Cursor cursor) {
+	private ScenicSpot constructInstance(Cursor cursor, boolean hasDistance) {
 		ScenicSpot scenicSpot = new ScenicSpot();
 		scenicSpot.setID(cursor.getInt(cursor.getColumnIndex("ID")));
 		scenicSpot.setName(cursor.getString(cursor.getColumnIndex("Name")));
@@ -224,6 +321,10 @@ public class DatabaseManager {
 		scenicSpot.setLat(cursor.getDouble(cursor.getColumnIndex("Lat")));
 		scenicSpot.setX(cursor.getDouble(cursor.getColumnIndex("X")));
 		scenicSpot.setY(cursor.getDouble(cursor.getColumnIndex("Y")));
+		if (hasDistance) {
+			scenicSpot.setDistance(Math.sqrt(cursor.getDouble(cursor
+					.getColumnIndex("sd"))));
+		}
 		return scenicSpot;
 	}
 
