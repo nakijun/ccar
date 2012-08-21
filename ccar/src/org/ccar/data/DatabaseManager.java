@@ -333,32 +333,7 @@ public class DatabaseManager {
 	 * 关闭数据库。
 	 */
 	public void closeDatabase() {
-		updateDatabase();
 		dbHelper.close();
-	}
-
-	public void updateDatabase() {
-		try {
-			SQLiteDatabase database = dbHelper.getWritableDatabase();
-			String sql = "select * from t_scenicspot order by name";
-			Cursor cursor = database.rawQuery(sql, null);
-			while (cursor.moveToNext()) {
-				int id = cursor.getInt(cursor.getColumnIndex("ID"));
-				double lon = cursor.getDouble(cursor.getColumnIndex("Lon"));
-				double lat = cursor.getDouble(cursor.getColumnIndex("Lat"));
-				double[] xy = GeoCalcUtil.WGS2flat(lon, lat);
-				ContentValues cv = new ContentValues();
-				cv.put("X", xy[0]);
-				cv.put("Y", xy[1]);
-				database.update("t_scenicspot", cv, "id = ?",
-						new String[] { String.valueOf(id) });
-			}
-			cursor.close();
-		} catch (Exception e) {
-			Toast.makeText(context, "更新数据库出错！",
-					Toast.LENGTH_SHORT).show();
-			e.printStackTrace();
-		}
 	}
 
 }
