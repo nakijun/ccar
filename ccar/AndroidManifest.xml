@@ -30,7 +30,8 @@
 		    	  android:label="@string/AR"
 		    	  android:screenOrientation="landscape"></activity>
 		<activity android:name=".NavigationActivity"
-		    	  android:label="@string/navigation"></activity>
+		    	  android:label="@string/navigation"
+		    	  android:configChanges="orientation"></activity>
 		<activity android:name=".SpotInfoActivity"
 		    	  android:label="@string/spotinfo"></activity>
     </application>
