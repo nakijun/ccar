@@ -161,20 +161,11 @@ public class NavigationActivity extends Activity {
                     double x1 = point.getX();
                     double y1 = point.getY();
                     
-                    if (distance == 0) {
+                    if (distance == 0 || distance > Math.sqrt((x - x1) * (x - x1) + (y - y1) * (y - y1))) {
                     	distance = Math.sqrt((x - x1) * (x - x1) + (y - y1) * (y - y1));
                     	if (distance < THRESHOLD_FEATURE_SELECTION) {
                             resultGraphic = graphic;
                         }
-                    } else {
-                    	if (distance > Math.sqrt((x - x1) * (x - x1) + (y - y1) * (y - y1))) {
-                    		distance = Math.sqrt((x - x1) * (x - x1) + (y - y1) * (y - y1));
-                    		if (distance < THRESHOLD_FEATURE_SELECTION) {
-                                resultGraphic = graphic;
-                            }
-                    		
-                    	}
-                    	
                     }
                 }
             }
