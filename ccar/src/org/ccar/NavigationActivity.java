@@ -10,6 +10,7 @@ import org.ccar.data.ScenicSpot;
 import com.esri.android.map.GraphicsLayer;
 import com.esri.android.map.InfoTemplate;
 import com.esri.android.map.MapView;
+import com.esri.android.map.ags.ArcGISLocalTiledLayer;
 import com.esri.android.map.ags.ArcGISTiledMapServiceLayer;
 import com.esri.android.map.event.OnSingleTapListener;
 import com.esri.core.geometry.Point;
@@ -76,7 +77,7 @@ public class NavigationActivity extends Activity {
 	 */
 	private void setControlProperty() {
 		// 设置地图及其Layer
-		mapView.addLayer(new ArcGISTiledMapServiceLayer("http://192.168.1.102/ArcGIS/rest/services/Xixi/MapServer"));
+		mapView.addLayer(new ArcGISLocalTiledLayer("file:///mnt/sdcard/ccar/Layers"));
 		gLayer = new GraphicsLayer();
 		mapView.addLayer(gLayer);
 		
