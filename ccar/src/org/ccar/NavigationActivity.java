@@ -2,7 +2,6 @@ package org.ccar;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.ccar.app.CCARApplication;
 import org.ccar.data.DatabaseManager;
@@ -15,9 +14,7 @@ import com.esri.android.map.ags.ArcGISTiledMapServiceLayer;
 import com.esri.android.map.event.OnSingleTapListener;
 import com.esri.core.geometry.Point;
 import com.esri.core.map.Graphic;
-import com.esri.core.renderer.SimpleRenderer;
 import com.esri.core.symbol.SimpleMarkerSymbol;
-import com.esri.core.symbol.Symbol;
 
 import android.app.Activity;
 import android.graphics.Color;
@@ -44,7 +41,6 @@ public class NavigationActivity extends Activity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.navigation);
@@ -65,14 +61,12 @@ public class NavigationActivity extends Activity {
 
 	@Override
 	protected void onPause() {
-		// TODO Auto-generated method stub
 		super.onPause();
 		mapView.pause();
 	}
 
 	@Override
 	protected void onResume() {
-		// TODO Auto-generated method stub
 		super.onResume();
 		mapView.unpause();
 	}
