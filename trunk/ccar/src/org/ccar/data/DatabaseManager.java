@@ -9,12 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.ccar.R;
-import org.ccar.app.GeoCalcUtil;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
 import android.widget.Toast;
 
