@@ -52,7 +52,6 @@ public class SpotListActivity extends ListActivity {
 		HashMap<String, String> map = (HashMap<String, String>) l.getItemAtPosition(position);
 		Intent i = new Intent(this, SpotInfoActivity.class);
 		i.putExtra("spot_id", map.get("spot_id"));
-		i.putExtra("spot_name", map.get("spot_name"));
 		startActivity(i);
 	}
 	
