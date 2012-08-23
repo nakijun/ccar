@@ -7,23 +7,26 @@ import org.ccar.app.CCARApplication;
 import org.ccar.data.DatabaseManager;
 import org.ccar.data.ScenicSpot;
 
+import com.esri.android.map.Callout;
 import com.esri.android.map.GraphicsLayer;
 import com.esri.android.map.InfoTemplate;
 import com.esri.android.map.MapView;
 import com.esri.android.map.ags.ArcGISLocalTiledLayer;
-import com.esri.android.map.ags.ArcGISTiledMapServiceLayer;
 import com.esri.android.map.event.OnSingleTapListener;
 import com.esri.core.geometry.Point;
 import com.esri.core.map.Graphic;
 import com.esri.core.symbol.SimpleMarkerSymbol;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 /**
@@ -39,6 +42,7 @@ public class NavigationActivity extends Activity {
 	private Button btnZoomIn;
 	private Button btnZoomOut;
 	private GraphicsLayer gLayer;
+	private Callout callout;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -80,7 +84,6 @@ public class NavigationActivity extends Activity {
 		mapView.addLayer(new ArcGISLocalTiledLayer("file:///mnt/sdcard/ccar/Layers"));
 		gLayer = new GraphicsLayer();
 		mapView.addLayer(gLayer);
-		
 		mapView.setOnSingleTapListener(m_onSingleTapListener);
 		
 		// 设置按钮属性
@@ -102,6 +105,10 @@ public class NavigationActivity extends Activity {
 		});
 	}
 	
+	/**
+	 * 地图单击事件监听器
+	 * 
+	 */
 	private final OnSingleTapListener m_onSingleTapListener = new OnSingleTapListener() {
 		private static final long serialVersionUID = 1L;
 
@@ -111,11 +118,44 @@ public class NavigationActivity extends Activity {
                 return;
             }
 			Graphic g = GetGraphicsFromLayer(x, y, gLayer);
+			callout = mapView.getCallout();
 			if (g != null) {
-				Toast.makeText(NavigationActivity.this, g.getInfoTemplate().getContent(g), Toast.LENGTH_SHORT).show();
+				callout.setStyle(R.xml.spotinfo_callout);
+				callout.setContent(loadCalloutView(g.getInfoTemplate().getTitle(g), g.getInfoTemplate().getContent(g)));
+				callout.show((Point)g.getGeometry());
+			} else {
+				if (callout.isShowing())
+					callout.hide();
 			}
 		}
 	};
+	
+	/**
+	 * 加载Callout
+	 * @param spotID 景点ID
+	 * @param spotname 景点名称
+	 * @return
+	 */
+	private View loadCalloutView(String spotID, String spotname) {
+		View view = LayoutInflater.from(NavigationActivity.this).inflate(
+				R.layout.spotinfo_callout, null);
+
+		final TextView tvSpotname = (TextView) view.findViewById(R.id.callout_spotname);
+		tvSpotname.setText(spotname);
+		tvSpotname.setTag(spotID);
+		tvSpotname.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View view) {
+				Intent i = new Intent(NavigationActivity.this, SpotInfoActivity.class);
+				i.putExtra("spot_id", (String)view.getTag());
+				startActivity(i);
+//				Toast.makeText(NavigationActivity.this, tvSpotname.getText(), Toast.LENGTH_SHORT).show();
+			}
+		});
+
+		return view;
+	}
 	
 	/**
 	 * 显示景点Point
@@ -123,6 +163,7 @@ public class NavigationActivity extends Activity {
 	private void showScenicSpot() {
 		List<ScenicSpot> spotList = dm.getScenicSpots();
 		for (ScenicSpot spot : spotList) {
+			
 			Graphic g = new Graphic(new Point(spot.getLon(), spot.getLat()), 
 					new SimpleMarkerSymbol(Color.RED, 10, SimpleMarkerSymbol.STYLE.CIRCLE),
 					new HashMap<String, Object>(),
@@ -148,6 +189,7 @@ public class NavigationActivity extends Activity {
             double distance = 0; // 点击位置与Graphic的距离
             
             // 所有Graphic循环一遍，找到点中的Graphic
+            // TODO 算法效率较低，待改进
             for (int i = 0; i < graphicIDs.length; i++) {
                 Graphic graphic = layer.getGraphic(graphicIDs[i]);
                 if (graphic != null) {
