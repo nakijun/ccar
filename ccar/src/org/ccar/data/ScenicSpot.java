@@ -79,6 +79,27 @@ public class ScenicSpot {
 	public void setDescription(String description) {
 		this.description = description;
 	}
+	
+	/**
+	 * 景点的图片文件名，多个文件以“_”分割
+	 */
+	private String imageFiles;
+	
+	/**
+	 * 获取景点图片文件名
+	 * @return 景点图片文件名，如有多个文件，以“_”分割
+	 */
+	public String getImageFiles() {
+		return imageFiles;
+	}
+
+	/**
+	 * 设置景点图片文件名
+	 * @param imageFiles 景点图片文件名，如有多个文件，以“_”分割
+	 */
+	public void setImageFiles(String imageFiles) {
+		this.imageFiles = imageFiles;
+	}
 
 	/**
 	 * 景点所在的经度。
