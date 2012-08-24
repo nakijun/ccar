@@ -117,8 +117,8 @@ public class SpotListActivity extends ListActivity {
 		}
 		
 		// 分别通过基站、GPS获取当前位置
-		locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 600, 0, locationListener);
-		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10, 0, locationListener);
+		locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 600, 100, locationListener);
+		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 60, 100, locationListener);
 	}
 	
 	/**
