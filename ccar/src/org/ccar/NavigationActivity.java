@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.ccar.app.CCARApplication;
+import org.ccar.app.GraphicCalcUtil;
 import org.ccar.data.DatabaseManager;
 import org.ccar.data.ScenicSpot;
 
@@ -20,6 +21,7 @@ import com.esri.core.symbol.SimpleMarkerSymbol;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -117,7 +119,7 @@ public class NavigationActivity extends Activity {
 			if (!mapView.isLoaded()) {
                 return;
             }
-			Graphic g = GetGraphicsFromLayer(x, y, gLayer);
+			Graphic g = getGraphicFromLayer(x, y, gLayer);
 			callout = mapView.getCallout();
 			if (g != null) {
 				callout.setStyle(R.xml.spotinfo_callout);
@@ -173,13 +175,13 @@ public class NavigationActivity extends Activity {
 	}
 	
 	/**
-	 * 从一个图层里查找获得 Graphics对象，范围是50像素半径圆
+	 * 从一个图层里查找获得 Graphics对象，范围是指定点的50像素半径圆内
 	 * @param xScreen 屏幕x坐标
 	 * @param yScreen 屏幕y坐标
 	 * @param layer 目标图层
 	 * @return
 	 */
-	private Graphic GetGraphicsFromLayer(double xScreen, double yScreen, GraphicsLayer layer) {
+	private Graphic getGraphicFromLayer(float xScreen, float yScreen, GraphicsLayer layer) {
         Graphic resultGraphic = null;
         try {
             int[] graphicIDs = layer.getGraphicIDs(); // 所有Graphic的ID
@@ -197,9 +199,9 @@ public class NavigationActivity extends Activity {
                     point = mapView.toScreenPoint(point);
                     double x1 = point.getX();
                     double y1 = point.getY();
-                    
-                    if (distance == 0 || distance > Math.sqrt((x - x1) * (x - x1) + (y - y1) * (y - y1))) {
-                    	distance = Math.sqrt((x - x1) * (x - x1) + (y - y1) * (y - y1));
+
+                    if (distance == 0 || distance > GraphicCalcUtil.getDistance(x, y, x1, y1)) {
+                    	distance = GraphicCalcUtil.getDistance(x, y, x1, y1);
                     	if (distance < THRESHOLD_FEATURE_SELECTION) {
                             resultGraphic = graphic;
                         }
