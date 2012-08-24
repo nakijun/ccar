@@ -317,6 +317,7 @@ public class DatabaseManager {
 		scenicSpot.setName(cursor.getString(cursor.getColumnIndex("Name")));
 		scenicSpot.setDescription(cursor.getString(cursor
 				.getColumnIndex("Description")));
+		scenicSpot.setImageFiles(cursor.getString(cursor.getColumnIndex("ImageFiles")));
 		scenicSpot.setLon(cursor.getDouble(cursor.getColumnIndex("Lon")));
 		scenicSpot.setLat(cursor.getDouble(cursor.getColumnIndex("Lat")));
 		if (hasDistance) {
