@@ -6,5 +6,9 @@
     <TextView android:id="@+id/spot_info"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"/>
-
+	<ImageView android:id="@+id/spot_image"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:maxWidth="240dp"
+	    android:maxHeight="260dp" />"
 </LinearLayout>
