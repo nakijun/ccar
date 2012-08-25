@@ -16,7 +16,9 @@ import com.esri.android.map.ags.ArcGISLocalTiledLayer;
 import com.esri.android.map.event.OnSingleTapListener;
 import com.esri.core.geometry.Point;
 import com.esri.core.map.Graphic;
+import com.esri.core.symbol.PictureMarkerSymbol;
 import com.esri.core.symbol.SimpleMarkerSymbol;
+import com.esri.core.symbol.Symbol;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -165,12 +167,40 @@ public class NavigationActivity extends Activity {
 	private void showScenicSpot() {
 		List<ScenicSpot> spotList = dm.getScenicSpots();
 		for (ScenicSpot spot : spotList) {
+			Symbol symbol = null;
+			if (spot.getCode().equals("RK") || spot.getCode().equals("CK")) {
+				symbol = new PictureMarkerSymbol(this.getResources().getDrawable(R.drawable.rk));
+			} else if (spot.getCode().equals("JD")) {
+				symbol = new SimpleMarkerSymbol(Color.BLUE, 6, SimpleMarkerSymbol.STYLE.CIRCLE);
+			} else if (spot.getCode().equals("JDCR")) {
+				symbol = new SimpleMarkerSymbol(Color.GREEN, 6, SimpleMarkerSymbol.STYLE.CIRCLE);
+			} else if (spot.getCode().equals("JZ")) {
+				symbol = new SimpleMarkerSymbol(Color.CYAN, 6, SimpleMarkerSymbol.STYLE.CIRCLE);
+			} else if (spot.getCode().equals("QL")) {
+				symbol = new SimpleMarkerSymbol(Color.YELLOW, 6, SimpleMarkerSymbol.STYLE.CIRCLE);
+			} else if (spot.getCode().equals("CY")) {
+				symbol = new SimpleMarkerSymbol(Color.GRAY, 6, SimpleMarkerSymbol.STYLE.CIRCLE);
+			} else if (spot.getCode().equals("FW")) {
+				symbol = new SimpleMarkerSymbol(Color.MAGENTA, 6, SimpleMarkerSymbol.STYLE.CIRCLE);
+			} else if (spot.getCode().equals("ZXC")) {
+				symbol = new SimpleMarkerSymbol(Color.RED, 8, SimpleMarkerSymbol.STYLE.CROSS);
+			} else if (spot.getCode().equals("CS")) {
+				symbol = new SimpleMarkerSymbol(Color.BLUE, 6, SimpleMarkerSymbol.STYLE.DIAMOND);
+			} else if (spot.getCode().equals("TCC")) {
+				symbol = new SimpleMarkerSymbol(Color.CYAN, 6, SimpleMarkerSymbol.STYLE.SQUARE);
+			} else if (spot.getCode().equals("MT")) {
+				symbol = new SimpleMarkerSymbol(Color.GREEN, 6, SimpleMarkerSymbol.STYLE.DIAMOND);
+			} else if (spot.getCode().equals("HC")) {
+				symbol = new SimpleMarkerSymbol(Color.YELLOW, 6, SimpleMarkerSymbol.STYLE.SQUARE);
+			}
 			
-			Graphic g = new Graphic(new Point(spot.getLon(), spot.getLat()), 
-					new SimpleMarkerSymbol(Color.RED, 10, SimpleMarkerSymbol.STYLE.CIRCLE),
-					new HashMap<String, Object>(),
-					new InfoTemplate(String.valueOf(spot.getID()), spot.getName()));
-			gLayer.addGraphic(g);
+			if (symbol != null) {
+				Graphic g = new Graphic(new Point(spot.getLon(), spot.getLat()), 
+						symbol,
+						new HashMap<String, Object>(),
+						new InfoTemplate(String.valueOf(spot.getID()), spot.getName()));
+				gLayer.addGraphic(g);
+			}
 		}
 	}
 	

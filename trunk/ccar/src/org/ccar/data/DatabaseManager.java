@@ -315,6 +315,7 @@ public class DatabaseManager {
 		ScenicSpot scenicSpot = new ScenicSpot();
 		scenicSpot.setID(cursor.getInt(cursor.getColumnIndex("ID")));
 		scenicSpot.setName(cursor.getString(cursor.getColumnIndex("Name")));
+		scenicSpot.setCode(cursor.getString(cursor.getColumnIndex("Code")));
 		scenicSpot.setDescription(cursor.getString(cursor
 				.getColumnIndex("Description")));
 		scenicSpot.setImageFiles(cursor.getString(cursor.getColumnIndex("ImageFiles")));

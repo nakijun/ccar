@@ -55,6 +55,27 @@ public class ScenicSpot {
 	public void setName(String name) {
 		this.name = name;
 	}
+	
+	/**
+	 * 景点类型编码
+	 */
+	private String code;
+	
+	/**
+	 * 获取景点类型编码
+	 * @return 景点类型编码
+	 */
+	public String getCode() {
+		return code;
+	}
+
+	/**
+	 * 设置景点类型编码
+	 * @param code 景点类型编码
+	 */
+	public void setCode(String code) {
+		this.code = code;
+	}
 
 	/**
 	 * 景点的描述。
