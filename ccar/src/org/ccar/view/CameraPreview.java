@@ -2,8 +2,16 @@ package org.ccar.view;
 
 import java.io.IOException;
 
+import org.ccar.R;
+
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.Rect;
 import android.hardware.Camera;
+import android.hardware.Camera.PreviewCallback;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
@@ -29,7 +37,7 @@ public class CameraPreview extends SurfaceView implements Callback {
 	}
 
 	@Override
-	public void surfaceChanged(SurfaceHolder arg0, int arg1, int arg2, int arg3) {
+	public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
 		// If your preview can change or rotate, take care of those events here.
         // Make sure to stop the preview before resizing or reformatting it.
 
@@ -56,9 +64,17 @@ public class CameraPreview extends SurfaceView implements Callback {
 		try {
             mCamera.setPreviewDisplay(holder);
             mCamera.startPreview();
+            mCamera.setPreviewCallback(new PreviewCallback() {
+				
+				@Override
+				public void onPreviewFrame(byte[] data, Camera camera) {
+
+				}
+			});
         } catch (IOException e) {
             Log.d("CameraPreview", "Error setting camera preview: " + e.getMessage());
         }
+		
 	}
 
 	@Override
