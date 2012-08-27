@@ -9,6 +9,8 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.hardware.Camera;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -25,6 +27,7 @@ public class AROverlayView extends View implements Runnable {
 	SensorManager sensorManager;
 	List<Bitmap> iconList;
 	int showIndex = 0;
+	int i = 0, j = 0;
 	
 
 	public AROverlayView(Context context, SensorManager sensorManager) {
@@ -32,30 +35,36 @@ public class AROverlayView extends View implements Runnable {
 		
 		this.sensorManager = sensorManager;
 		
-		initSensorManager();
-		
 		initIconList();
+		
+		new Thread(this).start();
 	}
 
 	@Override
 	protected void onDraw(Canvas canvas) {
-		for (int i = 0; i < iconList.size(); i++) {
-			canvas.drawBitmap(iconList.get(i), 100 + i * 30, 100, null);
+//		for (int i = 0; i < iconList.size(); i++) {
+//			canvas.drawBitmap(iconList.get(i), 100 + i * 30, 100, null);
+//		}
+//		
+		if (getWidth() != 0) {
+			canvas.drawBitmap(iconList.get(0), 400, j, null);
 		}
-		
-		canvas.drawBitmap(iconList.get(showIndex), 200, 200, null);
 	}
 
 	@Override
 	public void run() {
 		while (true) {
-			showIndex = (showIndex + 1) % iconList.size();
+//			showIndex = (showIndex + 1) % iconList.size();
+//			if (getWidth() != 0 && getHeight() != 0) {
+//				i = (i + 1) % getWidth();
+//				j = (j + 1) % getHeight();
+//			}
 			this.postInvalidate();
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+//			try {
+//				Thread.sleep(10);
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
 		}
 	}
 	
@@ -79,14 +88,25 @@ public class AROverlayView extends View implements Runnable {
 	}
 	
 	/**
-	 * 初始化传感器
+	 * 设置当前手机的方向
+	 * @param orientationValue
 	 */
-	private void initSensorManager() {
-//		sensorManager.registerListener(sensorEventListener, 
-//				sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION), 
-//				SensorManager.SENSOR_DELAY_NORMAL);
+	public void setOrientation(float[] orientationValue) {
+		orientationToScreenXY(orientationValue);
 	}
 	
+	private void orientationToScreenXY(float[] orientationValue) {
+//		Camera.Parameters param =  CameraPreview.camaraParam;
+//		System.out.println(orientationValue[0] + ", " + orientationValue[1] + ", " + orientationValue[2]);
+//		if (param != null && Math.abs(orientationValue[2]) != 0) {
+//			float vvAngle = param.getVerticalViewAngle();
+			double alpha = 21.25;
+			double beta = Math.PI / 2 + orientationValue[2];
+			int h = 240;
+			j = (int) (h * (Math.tan(Math.toRadians(alpha)) - Math.tan(beta)) / (2 * Math.tan(Math.toRadians(alpha))));
+			System.out.println(orientationValue[0] + ", " + orientationValue[1] + ", " + orientationValue[2]+ ", " + j);
+//		}
+	}
 	
 
 }
