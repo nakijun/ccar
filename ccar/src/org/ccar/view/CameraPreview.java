@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.ccar.R;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -25,14 +26,13 @@ import android.view.SurfaceView;
 public class CameraPreview extends SurfaceView implements Callback {
 	private SurfaceHolder mHolder;
 	private Camera mCamera;
+	public static Camera.Parameters camaraParam;
 
-	public CameraPreview(Context context, Camera camera) {
+	public CameraPreview(Context context) {
 		super(context);
-		mCamera = camera;
 		
 		mHolder = getHolder();
 		mHolder.addCallback(this);
-		
 		mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 	}
 
@@ -55,12 +55,15 @@ public class CameraPreview extends SurfaceView implements Callback {
             mCamera.setPreviewDisplay(mHolder);
             mCamera.startPreview();
         } catch (Exception e){
-            Log.d("CameraPreview", "Error starting camera preview: " + e.getMessage());
+        	e.printStackTrace();
+        	mCamera.release();
+			mCamera = null;
         }
 	}
 
 	@Override
 	public void surfaceCreated(SurfaceHolder holder) {
+		mCamera = Camera.open();
 		try {
             mCamera.setPreviewDisplay(holder);
             mCamera.startPreview();
@@ -72,15 +75,48 @@ public class CameraPreview extends SurfaceView implements Callback {
 				}
 			});
         } catch (IOException e) {
-            Log.d("CameraPreview", "Error setting camera preview: " + e.getMessage());
+        	e.printStackTrace();
+        	mCamera.release();
+			mCamera = null;
         }
-		
+		camaraParam = mCamera.getParameters();
 	}
 
 	@Override
 	public void surfaceDestroyed(SurfaceHolder holder) {
-		// TODO Auto-generated method stub
-
+		mCamera.setPreviewCallback(null) ;
+		mCamera.stopPreview();
+		mCamera.release();
+		mCamera = null;
 	}
 
+	/**
+	 * 检测设备是否有摄像头
+	 * @param context
+	 * @return
+	 */
+	private boolean checkCameraHardware(Context context) {
+	    if (context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)){
+	        // 有摄像头
+	        return true;
+	    } else {
+	        // 没有摄像头
+	        return false;
+	    }
+	}
+	
+	/**
+	 * 获取摄像头
+	 * @return 返回一个Camera实例，如果没有Camera或当前不可用，则返回null
+	 */
+	public static Camera getCameraInstance(){
+	    Camera c = null;
+	    try {
+	        c = Camera.open();
+	    }
+	    catch (Exception e){
+	        e.printStackTrace();
+	    }
+	    return c;
+	}
 }
