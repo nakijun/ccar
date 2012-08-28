@@ -2,6 +2,7 @@ package org.ccar;
 
 import org.ccar.view.AROverlayView;
 import org.ccar.view.CameraPreview;
+import org.codehaus.jackson.JsonParser;
 
 import android.app.Activity;
 import android.content.Context;
@@ -12,6 +13,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
