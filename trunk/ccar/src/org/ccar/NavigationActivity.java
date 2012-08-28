@@ -26,6 +26,8 @@ import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -109,6 +111,32 @@ public class NavigationActivity extends Activity {
 		});
 	}
 	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.navigation_menu, menu);  // 从资源创建菜单
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		return (applyMenuChoice(item) || super.onOptionsItemSelected(item));
+	}
+	
+	/**
+	 * 实现各菜单项的功能
+	 * @param item 菜单项
+	 * @return
+	 */
+	private boolean applyMenuChoice(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.clear_results:
+			Toast.makeText(this, getResources().getString(R.string.clear_results), Toast.LENGTH_SHORT).show();
+			return true;
+			
+		}
+		return false;
+	}
+
 	/**
 	 * 地图单击事件监听器
 	 * 
