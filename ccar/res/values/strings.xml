@@ -12,5 +12,9 @@
     <string name="database_not_initialized">数据库尚未初始化！</string>
     <string name="symbol_zoomin">+</string>
     <string name="symbol_zoomout">-</string>
+    <string name="route_solve_error">查找路线失败！</string>
+    <string name="no_route_solution_found">没有找到可行路线！</string>
+    <string name="json_related_error">数据格式不正确！</string>
+    <string name="nav">导航</string>
     <string name="clear_results">清除结果</string>
 </resources>

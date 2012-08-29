@@ -4,9 +4,9 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.ccar.app.CCARApplication;
-import org.ccar.app.GraphicCalcUtil;
 import org.ccar.data.DatabaseManager;
 import org.ccar.data.ScenicSpot;
+import org.ccar.task.RouteTask;
 
 import com.esri.android.map.Callout;
 import com.esri.android.map.GraphicsLayer;
@@ -16,14 +16,15 @@ import com.esri.android.map.ags.ArcGISLocalTiledLayer;
 import com.esri.android.map.event.OnSingleTapListener;
 import com.esri.core.geometry.Point;
 import com.esri.core.map.Graphic;
+import com.esri.core.renderer.SimpleRenderer;
 import com.esri.core.symbol.PictureMarkerSymbol;
+import com.esri.core.symbol.SimpleLineSymbol;
 import com.esri.core.symbol.SimpleMarkerSymbol;
 import com.esri.core.symbol.Symbol;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.Rect;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -37,36 +38,54 @@ import android.widget.Toast;
 
 /**
  * 导航，即地图界面
+ * 
  * @author swansword
- *
+ * 
  */
 public class NavigationActivity extends Activity {
-	private static final int THRESHOLD_FEATURE_SELECTION = 50;
-	
 	private DatabaseManager dm;
 	private MapView mapView;
 	private Button btnZoomIn;
 	private Button btnZoomOut;
-	private GraphicsLayer gLayer;
 	private Callout callout;
+
+	/**
+	 * 景点图层。
+	 */
+	private GraphicsLayer scenicSpotsLayer;
+
+	/**
+	 * 路径图层。
+	 */
+	private GraphicsLayer routeLayer;
+
+	/**
+	 * 当前被选中的景点。
+	 */
+	private Graphic selectedScenicSpot;
+
+	/**
+	 * 指示是否正在进行导航。
+	 */
+	private boolean isNavigating;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.navigation);
-		
+
 		// 初始化DatabaseManager
 		CCARApplication ccarApplication = (CCARApplication) getApplication();
 		dm = ccarApplication.getDatabaseManager();
-		
+
 		// 初始化控件
-		mapView = (MapView)findViewById(R.id.map);
-		btnZoomIn = (Button)findViewById(R.id.map_zoomin_button);
-		btnZoomOut = (Button)findViewById(R.id.map_zoomout_button);
-		
+		mapView = (MapView) findViewById(R.id.map);
+		btnZoomIn = (Button) findViewById(R.id.map_zoomin_button);
+		btnZoomOut = (Button) findViewById(R.id.map_zoomout_button);
+
 		setControlProperty(); // 设置控件属性
-		
+
 		showScenicSpot();
 	}
 
@@ -81,21 +100,17 @@ public class NavigationActivity extends Activity {
 		super.onResume();
 		mapView.unpause();
 	}
-	
+
 	/**
 	 * 设置控件属性
 	 */
 	private void setControlProperty() {
-		// 设置地图及其Layer
-		mapView.addLayer(new ArcGISLocalTiledLayer("file:///mnt/sdcard/ccar/Layers"));
-		gLayer = new GraphicsLayer();
-		mapView.addLayer(gLayer);
-		mapView.setOnSingleTapListener(m_onSingleTapListener);
-		
+		setMapView();
+
 		// 设置按钮属性
 		btnZoomIn.getBackground().setAlpha(155);
 		btnZoomOut.getBackground().setAlpha(155);
-		
+
 		// 设置按钮监听器
 		btnZoomIn.setOnClickListener(new OnClickListener() {
 			@Override
@@ -110,10 +125,33 @@ public class NavigationActivity extends Activity {
 			}
 		});
 	}
-	
+
+	/**
+	 * 设置地图视图以及地图图层。
+	 */
+	private void setMapView() {
+		// 添加本地缓存图层。
+		mapView.addLayer(new ArcGISLocalTiledLayer(
+				"file:///mnt/sdcard/ccar/Layers"));
+
+		// 添加景点图层。
+		scenicSpotsLayer = new GraphicsLayer();
+		mapView.addLayer(scenicSpotsLayer);
+
+		// 添加路径图层。
+		routeLayer = new GraphicsLayer();
+		SimpleLineSymbol symbol = new SimpleLineSymbol(Color.BLUE, 2);
+		SimpleRenderer renderer = new SimpleRenderer(symbol);
+		routeLayer.setRenderer(renderer);
+		mapView.addLayer(routeLayer);
+
+		// 设置地图视图事件。
+		mapView.setOnSingleTapListener(m_onSingleTapListener);
+	}
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.navigation_menu, menu);  // 从资源创建菜单
+		getMenuInflater().inflate(R.menu.navigation_menu, menu); // 从资源创建菜单
 		return true;
 	}
 
@@ -121,18 +159,19 @@ public class NavigationActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		return (applyMenuChoice(item) || super.onOptionsItemSelected(item));
 	}
-	
+
 	/**
 	 * 实现各菜单项的功能
-	 * @param item 菜单项
+	 * 
+	 * @param item
+	 *            菜单项
 	 * @return
 	 */
 	private boolean applyMenuChoice(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.clear_results:
-			Toast.makeText(this, getResources().getString(R.string.clear_results), Toast.LENGTH_SHORT).show();
+			routeLayer.removeAll();
 			return true;
-			
 		}
 		return false;
 	}
@@ -147,48 +186,92 @@ public class NavigationActivity extends Activity {
 		@Override
 		public void onSingleTap(float x, float y) {
 			if (!mapView.isLoaded()) {
-                return;
-            }
-			Graphic g = getGraphicFromLayer(x, y, gLayer);
-			callout = mapView.getCallout();
-			if (g != null) {
+				return;
+			}
+
+			if (isNavigating) {
+				routeLayer.removeAll();
+
+				RouteTask routeTask = new RouteTask(
+						"http://192.168.1.100/ArcGIS/rest/services/pathline/NAServer/Route",
+						mapView.toMapPoint(x, y), (Point) selectedScenicSpot
+								.getGeometry());
+				int errorCode = routeTask.Solve();
+				if (errorCode > 0) {
+					Toast.makeText(NavigationActivity.this, errorCode,
+							Toast.LENGTH_SHORT);
+				} else {
+					Graphic route = new Graphic(routeTask.getResult(), null);
+					routeLayer.addGraphic(route);
+				}
+
+				selectedScenicSpot = null;
+				isNavigating = false;
+				return;
+			}
+
+			int[] uids = scenicSpotsLayer.getGraphicIDs(x, y, 10);
+			if (uids != null && uids.length > 0) {
+				Graphic g = scenicSpotsLayer.getGraphic(uids[0]);
+				selectedScenicSpot = g;
+				callout = mapView.getCallout();
 				callout.setStyle(R.xml.spotinfo_callout);
-				callout.setContent(loadCalloutView(g.getInfoTemplate().getTitle(g), g.getInfoTemplate().getContent(g)));
-				callout.show((Point)g.getGeometry());
+				callout.setContent(loadCalloutView(g.getInfoTemplate()
+						.getTitle(g), g.getInfoTemplate().getContent(g)));
+				callout.show((Point) g.getGeometry());
 			} else {
+				selectedScenicSpot = null;
 				if (callout.isShowing())
 					callout.hide();
 			}
 		}
 	};
-	
+
 	/**
 	 * 加载Callout
-	 * @param spotID 景点ID
-	 * @param spotname 景点名称
+	 * 
+	 * @param spotID
+	 *            景点ID
+	 * @param spotname
+	 *            景点名称
 	 * @return
 	 */
 	private View loadCalloutView(String spotID, String spotname) {
 		View view = LayoutInflater.from(NavigationActivity.this).inflate(
 				R.layout.spotinfo_callout, null);
 
-		final TextView tvSpotname = (TextView) view.findViewById(R.id.callout_spotname);
+		final TextView tvSpotname = (TextView) view
+				.findViewById(R.id.callout_spotname);
 		tvSpotname.setText(spotname);
 		tvSpotname.setTag(spotID);
 		tvSpotname.setOnClickListener(new OnClickListener() {
-			
+
 			@Override
 			public void onClick(View view) {
-				Intent i = new Intent(NavigationActivity.this, SpotInfoActivity.class);
-				i.putExtra("spot_id", (String)view.getTag());
+				Intent i = new Intent(NavigationActivity.this,
+						SpotInfoActivity.class);
+				i.putExtra("spot_id", (String) view.getTag());
 				startActivity(i);
-//				Toast.makeText(NavigationActivity.this, tvSpotname.getText(), Toast.LENGTH_SHORT).show();
+				// Toast.makeText(NavigationActivity.this, tvSpotname.getText(),
+				// Toast.LENGTH_SHORT).show();
+			}
+		});
+
+		final Button btnNav = (Button) view
+				.findViewById(R.id.callout_nav_button);
+		btnNav.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				callout = mapView.getCallout();
+				callout.hide();
+				isNavigating = true;
 			}
 		});
 
 		return view;
 	}
-	
+
 	/**
 	 * 显示景点Point
 	 */
@@ -197,79 +280,50 @@ public class NavigationActivity extends Activity {
 		for (ScenicSpot spot : spotList) {
 			Symbol symbol = null;
 			if (spot.getCode().equals("RK") || spot.getCode().equals("CK")) {
-				symbol = new PictureMarkerSymbol(this.getResources().getDrawable(R.drawable.rk));
+				symbol = new PictureMarkerSymbol(this.getResources()
+						.getDrawable(R.drawable.rk));
 			} else if (spot.getCode().equals("JD")) {
-				symbol = new SimpleMarkerSymbol(Color.BLUE, 6, SimpleMarkerSymbol.STYLE.CIRCLE);
+				symbol = new SimpleMarkerSymbol(Color.BLUE, 6,
+						SimpleMarkerSymbol.STYLE.CIRCLE);
 			} else if (spot.getCode().equals("JDCR")) {
-				symbol = new SimpleMarkerSymbol(Color.GREEN, 6, SimpleMarkerSymbol.STYLE.CIRCLE);
+				symbol = new SimpleMarkerSymbol(Color.GREEN, 6,
+						SimpleMarkerSymbol.STYLE.CIRCLE);
 			} else if (spot.getCode().equals("JZ")) {
-				symbol = new SimpleMarkerSymbol(Color.CYAN, 6, SimpleMarkerSymbol.STYLE.CIRCLE);
+				symbol = new SimpleMarkerSymbol(Color.CYAN, 6,
+						SimpleMarkerSymbol.STYLE.CIRCLE);
 			} else if (spot.getCode().equals("QL")) {
-				symbol = new SimpleMarkerSymbol(Color.YELLOW, 6, SimpleMarkerSymbol.STYLE.CIRCLE);
+				symbol = new SimpleMarkerSymbol(Color.YELLOW, 6,
+						SimpleMarkerSymbol.STYLE.CIRCLE);
 			} else if (spot.getCode().equals("CY")) {
-				symbol = new SimpleMarkerSymbol(Color.GRAY, 6, SimpleMarkerSymbol.STYLE.CIRCLE);
+				symbol = new SimpleMarkerSymbol(Color.GRAY, 6,
+						SimpleMarkerSymbol.STYLE.CIRCLE);
 			} else if (spot.getCode().equals("FW")) {
-				symbol = new SimpleMarkerSymbol(Color.MAGENTA, 6, SimpleMarkerSymbol.STYLE.CIRCLE);
+				symbol = new SimpleMarkerSymbol(Color.MAGENTA, 6,
+						SimpleMarkerSymbol.STYLE.CIRCLE);
 			} else if (spot.getCode().equals("ZXC")) {
-				symbol = new SimpleMarkerSymbol(Color.RED, 8, SimpleMarkerSymbol.STYLE.CROSS);
+				symbol = new SimpleMarkerSymbol(Color.RED, 8,
+						SimpleMarkerSymbol.STYLE.CROSS);
 			} else if (spot.getCode().equals("CS")) {
-				symbol = new SimpleMarkerSymbol(Color.BLUE, 6, SimpleMarkerSymbol.STYLE.DIAMOND);
+				symbol = new SimpleMarkerSymbol(Color.BLUE, 6,
+						SimpleMarkerSymbol.STYLE.DIAMOND);
 			} else if (spot.getCode().equals("TCC")) {
-				symbol = new SimpleMarkerSymbol(Color.CYAN, 6, SimpleMarkerSymbol.STYLE.SQUARE);
+				symbol = new SimpleMarkerSymbol(Color.CYAN, 6,
+						SimpleMarkerSymbol.STYLE.SQUARE);
 			} else if (spot.getCode().equals("MT")) {
-				symbol = new SimpleMarkerSymbol(Color.GREEN, 6, SimpleMarkerSymbol.STYLE.DIAMOND);
+				symbol = new SimpleMarkerSymbol(Color.GREEN, 6,
+						SimpleMarkerSymbol.STYLE.DIAMOND);
 			} else if (spot.getCode().equals("HC")) {
-				symbol = new SimpleMarkerSymbol(Color.YELLOW, 6, SimpleMarkerSymbol.STYLE.SQUARE);
+				symbol = new SimpleMarkerSymbol(Color.YELLOW, 6,
+						SimpleMarkerSymbol.STYLE.SQUARE);
 			}
-			
+
 			if (symbol != null) {
-				Graphic g = new Graphic(new Point(spot.getLon(), spot.getLat()), 
-						symbol,
-						new HashMap<String, Object>(),
-						new InfoTemplate(String.valueOf(spot.getID()), spot.getName()));
-				gLayer.addGraphic(g);
+				Graphic g = new Graphic(
+						new Point(spot.getLon(), spot.getLat()), symbol,
+						new HashMap<String, Object>(), new InfoTemplate(
+								String.valueOf(spot.getID()), spot.getName()));
+				scenicSpotsLayer.addGraphic(g);
 			}
 		}
 	}
-	
-	/**
-	 * 从一个图层里查找获得 Graphics对象，范围是指定点的50像素半径圆内
-	 * @param xScreen 屏幕x坐标
-	 * @param yScreen 屏幕y坐标
-	 * @param layer 目标图层
-	 * @return
-	 */
-	private Graphic getGraphicFromLayer(float xScreen, float yScreen, GraphicsLayer layer) {
-        Graphic resultGraphic = null;
-        try {
-            int[] graphicIDs = layer.getGraphicIDs(); // 所有Graphic的ID
-            double x = xScreen;
-            double y = yScreen;
-            
-            double distance = 0; // 点击位置与Graphic的距离
-            
-            // 所有Graphic循环一遍，找到点中的Graphic
-            // TODO 算法效率较低，待改进
-            for (int i = 0; i < graphicIDs.length; i++) {
-                Graphic graphic = layer.getGraphic(graphicIDs[i]);
-                if (graphic != null) {
-                    Point point = (Point) graphic.getGeometry();
-                    point = mapView.toScreenPoint(point);
-                    double x1 = point.getX();
-                    double y1 = point.getY();
-
-                    if (distance == 0 || distance > GraphicCalcUtil.getDistance(x, y, x1, y1)) {
-                    	distance = GraphicCalcUtil.getDistance(x, y, x1, y1);
-                    	if (distance < THRESHOLD_FEATURE_SELECTION) {
-                            resultGraphic = graphic;
-                        }
-                    }
-                }
-            }
-        } catch (Exception e) {
-            return null;
-        }
-        return resultGraphic;
-    }
-
 }
