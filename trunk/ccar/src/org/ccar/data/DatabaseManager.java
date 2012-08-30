@@ -208,14 +208,11 @@ public class DatabaseManager {
 					+ ") * (y - " + y + ") as sod";
 		}
 		sql = sql + " from t_scenicspot";
-		String[] selectionArgs = null;
 		if (name != null) {
-			sql = sql + " where name = ?";
-			selectionArgs = new String[] { name };
+			sql = sql + " where name like '" + name + "%'";
 		}
 		sql = sql + " order by " + getOrderBy(name, x, y);
-		Cursor cursor = dbHelper.getReadableDatabase().rawQuery(sql,
-				selectionArgs);
+		Cursor cursor = dbHelper.getReadableDatabase().rawQuery(sql, null);
 		while (cursor.moveToNext()) {
 			ScenicSpot scenicSpot = constructInstance(cursor, hasDistance);
 			scenicSpots.add(scenicSpot);
@@ -255,16 +252,50 @@ public class DatabaseManager {
 					+ ") * (y - " + y + ") as sod";
 		}
 		sql = sql + " from t_scenicspot";
-		String[] selectionArgs = null;
 		if (name != null) {
-			sql = sql + " where name = ?";
-			selectionArgs = new String[] { name };
+			sql = sql + " where name like '" + name + "%'";
 		}
 		sql = sql + " order by " + getOrderBy(name, x, y);
 		sql = sql + " limit " + String.valueOf(limit) + " offset "
 				+ String.valueOf(offset);
-		Cursor cursor = dbHelper.getReadableDatabase().rawQuery(sql,
-				selectionArgs);
+		Cursor cursor = dbHelper.getReadableDatabase().rawQuery(sql, null);
+		while (cursor.moveToNext()) {
+			ScenicSpot scenicSpot = constructInstance(cursor, hasDistance);
+			scenicSpots.add(scenicSpot);
+		}
+		cursor.close();
+		return scenicSpots;
+	}
+
+	/**
+	 * 根据当前位置获取指定半径范围内的所有景点记录。
+	 * 
+	 * @param x
+	 *            当前位置的 X 坐标。
+	 * @param y
+	 *            当前位置的 Y 坐标。
+	 * @param radius
+	 *            半径。
+	 * @return 指定半径范围内的所有景点记录。
+	 */
+	public List<ScenicSpot> getScenicSpots(String x, String y, double radius) {
+		if (!initialized) {
+			Toast.makeText(context, R.string.database_not_initialized,
+					Toast.LENGTH_SHORT).show();
+		}
+
+		ArrayList<ScenicSpot> scenicSpots = new ArrayList<ScenicSpot>();
+		boolean hasDistance = false;
+		String sql = "select *";
+		if (x != null && y != null) {
+			hasDistance = true;
+			sql = sql + ", (x - " + x + ") * (x - " + x + ") + (y - " + y
+					+ ") * (y - " + y + ") as sod";
+		}
+		sql = sql + " from t_scenicspot";
+		sql = sql + " where sod <= " + String.valueOf(radius) + " * "
+				+ String.valueOf(radius);
+		Cursor cursor = dbHelper.getReadableDatabase().rawQuery(sql, null);
 		while (cursor.moveToNext()) {
 			ScenicSpot scenicSpot = constructInstance(cursor, hasDistance);
 			scenicSpots.add(scenicSpot);
@@ -285,18 +316,17 @@ public class DatabaseManager {
 	 * @return order by 语句。
 	 */
 	private String getOrderBy(String name, String x, String y) {
-		String orderby = null;
+		String orderby = "";
 		if (name != null) {
 			orderby = "name";
 		}
 		if (x != null && y != null) {
-			if (orderby == null) {
+			if (orderby != "") {
 				orderby = orderby + ", ";
 			}
-			orderby = orderby + "(x - " + x + ") * (x - " + x + ") + (y - " + y
-					+ ") * (y - " + y + ")";
+			orderby = orderby + "sod";
 		}
-		if (orderby == null) {
+		if (orderby == "") {
 			orderby = "name";
 		}
 		return orderby;
@@ -318,7 +348,8 @@ public class DatabaseManager {
 		scenicSpot.setCode(cursor.getString(cursor.getColumnIndex("Code")));
 		scenicSpot.setDescription(cursor.getString(cursor
 				.getColumnIndex("Description")));
-		scenicSpot.setImageFiles(cursor.getString(cursor.getColumnIndex("ImageFiles")));
+		scenicSpot.setImageFiles(cursor.getString(cursor
+				.getColumnIndex("ImageFiles")));
 		scenicSpot.setLon(cursor.getDouble(cursor.getColumnIndex("Lon")));
 		scenicSpot.setLat(cursor.getDouble(cursor.getColumnIndex("Lat")));
 		if (hasDistance) {
