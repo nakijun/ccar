@@ -295,7 +295,7 @@ public class DatabaseManager {
 		sql = sql + " from t_scenicspot";
 		sql = sql + " where sod <= " + String.valueOf(radius) + " * "
 				+ String.valueOf(radius);
-		sql = sql + " order by sod";
+		sql = sql + " order by sod desc";
 		Cursor cursor = dbHelper.getReadableDatabase().rawQuery(sql, null);
 		while (cursor.moveToNext()) {
 			ScenicSpot scenicSpot = constructInstance(cursor, hasDistance);
@@ -353,6 +353,8 @@ public class DatabaseManager {
 				.getColumnIndex("ImageFiles")));
 		scenicSpot.setLon(cursor.getDouble(cursor.getColumnIndex("Lon")));
 		scenicSpot.setLat(cursor.getDouble(cursor.getColumnIndex("Lat")));
+		scenicSpot.setX(cursor.getDouble(cursor.getColumnIndex("X")));
+		scenicSpot.setY(cursor.getDouble(cursor.getColumnIndex("Y")));
 		if (hasDistance) {
 			scenicSpot.setDistance(Math.sqrt(cursor.getDouble(cursor
 					.getColumnIndex("sod"))));
