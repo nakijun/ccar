@@ -295,6 +295,7 @@ public class DatabaseManager {
 		sql = sql + " from t_scenicspot";
 		sql = sql + " where sod <= " + String.valueOf(radius) + " * "
 				+ String.valueOf(radius);
+		sql = sql + " order by sod";
 		Cursor cursor = dbHelper.getReadableDatabase().rawQuery(sql, null);
 		while (cursor.moveToNext()) {
 			ScenicSpot scenicSpot = constructInstance(cursor, hasDistance);
