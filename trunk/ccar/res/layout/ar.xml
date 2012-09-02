@@ -2,12 +2,13 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
-    <FrameLayout 
-        android:id="@+id/camera_preview"
+    <FrameLayout android:id="@+id/camera_preview"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"></FrameLayout>
-	<FrameLayout 
-	    android:id="@+id/ar_overlay"
+	<FrameLayout android:id="@+id/ar_overlay"
 	    android:layout_width="fill_parent"
-	    android:layout_height="fill_parent"></FrameLayout>"
+	    android:layout_height="fill_parent"></FrameLayout>
+	<FrameLayout android:id="@+id/ar_radar"
+	    android:layout_width="fill_parent"
+	    android:layout_height="fill_parent"></FrameLayout>
 </FrameLayout>
