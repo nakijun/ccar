@@ -36,12 +36,6 @@ public class AROverlayView extends View implements Runnable {
 	int showIndex = 0;
 	int i = 0, j = 0;
 	
-	Bitmap radar;
-	Bitmap compass;
-	Matrix compassMatrix = new Matrix();
-	int rotate = 0;
-	
-
 	public AROverlayView(Context context, SensorManager sensorManager) {
 		super(context);
 		
@@ -49,8 +43,6 @@ public class AROverlayView extends View implements Runnable {
 		
 		initIconList();
 		
-		radar = BitmapFactory.decodeResource(this.getResources(), R.drawable.compass_plain);
-		compass = BitmapFactory.decodeResource(this.getResources(), R.drawable.compass_needle);
 		new Thread(this).start();
 	}
 	
@@ -107,7 +99,6 @@ public class AROverlayView extends View implements Runnable {
 //				i = (i + 1) % getWidth();
 //				j = (j + 1) % getHeight();
 //			}
-			rotate++;
 			this.postInvalidate();
 			try {
 				Thread.sleep(100);
