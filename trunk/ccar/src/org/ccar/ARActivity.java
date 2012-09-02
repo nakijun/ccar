@@ -2,6 +2,7 @@ package org.ccar;
 
 import org.ccar.view.AROverlayView;
 import org.ccar.view.CameraPreview;
+import org.ccar.view.RadarView;
 import org.codehaus.jackson.JsonParser;
 
 import android.app.Activity;
@@ -28,6 +29,7 @@ import android.widget.FrameLayout;
 public class ARActivity extends Activity {
     private CameraPreview mPreview; 		// 摄像头预览界面
     private AROverlayView overlayView; 		// 叠加层
+    private RadarView radarView;			// 雷达图
     private SensorManager sensorManager;	// 传感器管理器
     
     float[] gravity = new float[3]; 	// 加速度计测量值
@@ -48,14 +50,17 @@ public class ARActivity extends Activity {
 		
 //		mCamera = getCameraInstance();
 		
-		// Create our Preview view and set it as the content of our activity.
-        mPreview = new CameraPreview(this);
         FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
+        mPreview = new CameraPreview(this);
         preview.addView(mPreview);
         
         FrameLayout overlay = (FrameLayout) findViewById(R.id.ar_overlay);
         overlayView = new AROverlayView(this, sensorManager);
         overlay.addView(overlayView);
+        
+        FrameLayout radar = (FrameLayout) findViewById(R.id.ar_radar);
+        radarView = new RadarView(this, sensorManager);
+        radar.addView(radarView);
         
         
         sensorManager.registerListener(sensorEventListener, 
@@ -113,6 +118,7 @@ public class ARActivity extends Activity {
 //	        System.out.println(values[0] + ", " + values[1] + ", " + values[2]);
 //	        if ((int)values[0] != 0)
 	        overlayView.setOrientation(values);
+	        radarView.setOrientation(values);
 		}
 		
 		@Override
