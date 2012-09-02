@@ -30,10 +30,8 @@ import android.view.View;
  *
  */
 public class AROverlayView extends View implements Runnable {
-	private static final int RADAR_PADDING = 30;
 	SensorManager sensorManager;
 	List<Bitmap> iconList;
-	int showIndex = 0;
 	int i = 0, j = 0;
 	
 	public AROverlayView(Context context, SensorManager sensorManager) {
@@ -58,15 +56,6 @@ public class AROverlayView extends View implements Runnable {
 //			canvas.drawBitmap(iconList.get(0), 400, j, null);
 //		}
 		
-//		compassMatrix.reset();
-		
-//		compassMatrix.setRotate(90, RADAR_PADDING + radar.getWidth() / 2, RADAR_PADDING + radar.getHeight() / 2);
-//		compassMatrix.postTranslate(75, 16);
-//		canvas.drawBitmap(radar, RADAR_PADDING, RADAR_PADDING, null);
-		
-//		System.out.println(radar.getWidth() + ", " + compass.getWidth());
-//		Bitmap compass1 = Bitmap.createBitmap(compass, 0, 0, compass.getWidth(), compass.getHeight(), compassMatrix, true);
-//		canvas.drawBitmap(compass, compassMatrix, null);
 	}
 	
 	private void initializeCanvas(Canvas canvas) {
