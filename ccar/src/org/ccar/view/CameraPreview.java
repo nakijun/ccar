@@ -1,6 +1,10 @@
 package org.ccar.view;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
 import org.ccar.R;
 
@@ -13,6 +17,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.hardware.Camera;
 import android.hardware.Camera.PreviewCallback;
+import android.os.Environment;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
@@ -27,6 +32,8 @@ public class CameraPreview extends SurfaceView implements Callback {
 	private SurfaceHolder mHolder;
 	private Camera mCamera;
 	public static Camera.Parameters camaraParam;
+	
+	private int index = 0; 
 
 	public CameraPreview(Context context) {
 		super(context);
@@ -71,7 +78,20 @@ public class CameraPreview extends SurfaceView implements Callback {
 				
 				@Override
 				public void onPreviewFrame(byte[] data, Camera camera) {
-
+					if (index == 0) {
+						File file = new File(Environment.getExternalStorageDirectory().getPath()+"/ccar/preview.jpg");
+						try {
+							OutputStream os = new FileOutputStream(file);
+							os.write(data);
+							os.close();
+						} catch (FileNotFoundException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
 				}
 			});
         } catch (IOException e) {
