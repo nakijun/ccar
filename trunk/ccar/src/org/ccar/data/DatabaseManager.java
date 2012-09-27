@@ -65,7 +65,7 @@ public class DatabaseManager {
 	 * @return 是否拷贝成功。
 	 */
 	private boolean copyDatabase() {
-int i=0;
+
 		// 如果数据库目录不存在，则创建。
 		String dbPath = Environment.getDataDirectory() + "/data/"
 				+ context.getPackageName() + "/databases";
