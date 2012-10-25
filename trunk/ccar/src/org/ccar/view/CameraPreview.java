@@ -1,5 +1,6 @@
 package org.ccar.view;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -13,6 +14,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.ImageFormat;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.hardware.Camera;
@@ -74,6 +76,7 @@ public class CameraPreview extends SurfaceView implements Callback {
 		try {
             mCamera.setPreviewDisplay(holder);
             mCamera.startPreview();
+            mCamera.getParameters().setPreviewFormat(ImageFormat.JPEG);
             mCamera.setPreviewCallback(new PreviewCallback() {
 				
 				@Override
@@ -81,9 +84,17 @@ public class CameraPreview extends SurfaceView implements Callback {
 					if (index == 0) {
 						File file = new File(Environment.getExternalStorageDirectory().getPath()+"/ccar/preview.jpg");
 						try {
-							OutputStream os = new FileOutputStream(file);
-							os.write(data);
-							os.close();
+							int length = data.length;
+							Bitmap bitmap = rawByteArray2RGBABitmap2(data,mCamera.getParameters().getPreviewSize().width, mCamera.getParameters().getPreviewSize().height);
+//							Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, length);
+							FileOutputStream fout = new FileOutputStream(file);
+							BufferedOutputStream bos = new BufferedOutputStream(fout);
+							bitmap.compress(Bitmap.CompressFormat.JPEG, 80, bos);
+							bos.flush();
+							bos.close();
+//							OutputStream os = new FileOutputStream(file);
+//							os.write(bitmap.compress(format, quality, stream));
+//							os.close();
 						} catch (FileNotFoundException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -91,6 +102,7 @@ public class CameraPreview extends SurfaceView implements Callback {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
+						index++;
 					}
 				}
 			});
@@ -101,6 +113,33 @@ public class CameraPreview extends SurfaceView implements Callback {
         }
 		camaraParam = mCamera.getParameters();
 	}
+	
+	public static Bitmap rawByteArray2RGBABitmap2(byte[] data, int width, int height) {  
+        int frameSize = width * height;  
+        int[] rgba = new int[frameSize];  
+  
+            for (int i = 0; i < height; i++)  
+                for (int j = 0; j < width; j++) {  
+                    int y = (0xff & ((int) data[i * width + j]));  
+                    int u = (0xff & ((int) data[frameSize + (i >> 1) * width + (j & ~1) + 0]));  
+                    int v = (0xff & ((int) data[frameSize + (i >> 1) * width + (j & ~1) + 1]));  
+                    y = y < 16 ? 16 : y;  
+  
+                    int r = Math.round(1.164f * (y - 16) + 1.596f * (v - 128));  
+                    int g = Math.round(1.164f * (y - 16) - 0.813f * (v - 128) - 0.391f * (u - 128));  
+                    int b = Math.round(1.164f * (y - 16) + 2.018f * (u - 128));  
+  
+                    r = r < 0 ? 0 : (r > 255 ? 255 : r);  
+                    g = g < 0 ? 0 : (g > 255 ? 255 : g);  
+                    b = b < 0 ? 0 : (b > 255 ? 255 : b);  
+  
+                    rgba[i * width + j] = 0xff000000 + (b << 16) + (g << 8) + r;  
+                }  
+  
+        Bitmap bmp = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);  
+        bmp.setPixels(rgba, 0 , width, 0, 0, width, height);  
+        return bmp;  
+    }
 
 	@Override
 	public void surfaceDestroyed(SurfaceHolder holder) {

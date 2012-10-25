@@ -13,6 +13,9 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
@@ -31,6 +34,7 @@ public class ARActivity extends Activity {
     private AROverlayView overlayView; 		// 叠加层
     private RadarView radarView;			// 雷达图
     private SensorManager sensorManager;	// 传感器管理器
+    LocationManager locationManager;		// 位置管理器
     
     float[] gravity = new float[3]; 	// 加速度计测量值
     float[] geomagnetic = new float[3];	// 磁场传感器测量值
@@ -125,6 +129,37 @@ public class ARActivity extends Activity {
 		public void onAccuracyChanged(Sensor sensor, int accuracy) {
 			// TODO Auto-generated method stub
 			
+		}
+	};
+	
+	/**
+	 * 获取当前位置
+	 */
+	private void receiveCurrentLocation() {
+		locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);	
+		
+		// 分别通过基站、GPS获取当前位置
+//		locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 600, 100, locationListener);
+		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 100, locationListener);
+	}
+	
+	private final LocationListener locationListener = new LocationListener() {
+		
+		@Override
+		public void onStatusChanged(String provider, int status, Bundle extras) {
+		}
+		
+		@Override
+		public void onProviderEnabled(String provider) {
+		}
+		
+		@Override
+		public void onProviderDisabled(String provider) {
+		}
+		
+		@Override
+		public void onLocationChanged(Location location) {
+			radarView.setLocation(location);
 		}
 	};
 }
