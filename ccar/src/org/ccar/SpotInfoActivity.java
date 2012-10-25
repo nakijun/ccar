@@ -14,10 +14,12 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageView;
+import android.widget.ImageView.ScaleType;
 import android.widget.TextView;
 
 public class SpotInfoActivity extends Activity {
 	DatabaseManager dm;
+	TextView tvSpotName;
 	TextView tvSpotInfo;
 	ImageView imageSpotInfo;
 
@@ -31,7 +33,7 @@ public class SpotInfoActivity extends Activity {
 		CCARApplication ccarApplication = (CCARApplication) getApplication();
 		dm = ccarApplication.getDatabaseManager();
 		
-		
+		tvSpotName = (TextView)findViewById(R.id.spot_spotname);
 		tvSpotInfo = (TextView)findViewById(R.id.spot_info);
 		imageSpotInfo = (ImageView)findViewById(R.id.spot_image);
 		
@@ -40,9 +42,8 @@ public class SpotInfoActivity extends Activity {
 		
 		ScenicSpot spot = dm.getScenicSpot(Integer.parseInt(spotID));
 		
-		tvSpotInfo.setText("景点ID：" + spotID + 
-				"\n景点名称：" + spot.getName() + 
-				"\n景点介绍：" + spot.getDescription());
+		tvSpotName.setText(spot.getName());
+		tvSpotInfo.setText(spot.getDescription());
 		
 		String imageFiles = spot.getImageFiles();
 		if (imageFiles != null) {

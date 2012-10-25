@@ -2,13 +2,25 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:orientation="vertical"
+    >
+    <TextView android:id="@+id/spot_spotname"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:layout_marginLeft="10dip"
+    	android:layout_marginRight="10dip" />"
     <TextView android:id="@+id/spot_info"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:layout_marginLeft="10dip"
+    	android:layout_marginRight="10dip" />
 	<ImageView android:id="@+id/spot_image"
 	    android:layout_width="fill_parent"
 	    android:layout_height="wrap_content"
-	    android:maxWidth="240dp"
-	    android:maxHeight="260dp" />"
+	    android:maxWidth="480dp"
+	    android:maxHeight="520dp" />"
 </LinearLayout>

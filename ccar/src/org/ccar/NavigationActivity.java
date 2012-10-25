@@ -21,6 +21,8 @@ import com.esri.core.symbol.PictureMarkerSymbol;
 import com.esri.core.symbol.SimpleLineSymbol;
 import com.esri.core.symbol.SimpleMarkerSymbol;
 import com.esri.core.symbol.Symbol;
+import com.esri.core.symbol.TextSymbol;
+import com.esri.core.symbol.TextSymbol.HorizontalAlignment;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -193,7 +195,7 @@ public class NavigationActivity extends Activity {
 				routeLayer.removeAll();
 
 				RouteTask routeTask = new RouteTask(
-						"http://192.168.1.100/ArcGIS/rest/services/pathline/NAServer/Route",
+						"http://58.198.182.32/ArcGIS/rest/services/pathline/NAServer/Route",
 						mapView.toMapPoint(x, y), (Point) selectedScenicSpot
 								.getGeometry());
 				int errorCode = routeTask.Solve();
@@ -279,15 +281,19 @@ public class NavigationActivity extends Activity {
 		List<ScenicSpot> spotList = dm.getScenicSpots();
 		for (ScenicSpot spot : spotList) {
 			Symbol symbol = null;
-			if (spot.getCode().equals("RK") || spot.getCode().equals("CK")) {
+			TextSymbol textsymbol = null;
+			if (spot.getCode().equals("RK")) {
 				symbol = new PictureMarkerSymbol(this.getResources()
-						.getDrawable(R.drawable.rk));
+						.getDrawable(R.drawable.rk_s));
+			} else if (spot.getCode().equals("CK")) {
+				symbol = new PictureMarkerSymbol(this.getResources()
+						.getDrawable(R.drawable.ck_s));
 			} else if (spot.getCode().equals("JD")) {
-				symbol = new SimpleMarkerSymbol(Color.BLUE, 6,
-						SimpleMarkerSymbol.STYLE.CIRCLE);
+				symbol = new PictureMarkerSymbol(this.getResources()
+						.getDrawable(R.drawable.jd_s));
 			} else if (spot.getCode().equals("JDCR")) {
-				symbol = new SimpleMarkerSymbol(Color.GREEN, 6,
-						SimpleMarkerSymbol.STYLE.CIRCLE);
+//				symbol = new SimpleMarkerSymbol(Color.GREEN, 6,
+//						SimpleMarkerSymbol.STYLE.CIRCLE);
 			} else if (spot.getCode().equals("JZ")) {
 				symbol = new SimpleMarkerSymbol(Color.CYAN, 6,
 						SimpleMarkerSymbol.STYLE.CIRCLE);
@@ -295,23 +301,23 @@ public class NavigationActivity extends Activity {
 				symbol = new SimpleMarkerSymbol(Color.YELLOW, 6,
 						SimpleMarkerSymbol.STYLE.CIRCLE);
 			} else if (spot.getCode().equals("CY")) {
-				symbol = new SimpleMarkerSymbol(Color.GRAY, 6,
-						SimpleMarkerSymbol.STYLE.CIRCLE);
+				symbol = new PictureMarkerSymbol(this.getResources()
+						.getDrawable(R.drawable.cy_s));
 			} else if (spot.getCode().equals("FW")) {
-				symbol = new SimpleMarkerSymbol(Color.MAGENTA, 6,
-						SimpleMarkerSymbol.STYLE.CIRCLE);
+				symbol = new PictureMarkerSymbol(this.getResources()
+						.getDrawable(R.drawable.fw_s));
 			} else if (spot.getCode().equals("ZXC")) {
 				symbol = new SimpleMarkerSymbol(Color.RED, 8,
 						SimpleMarkerSymbol.STYLE.CROSS);
 			} else if (spot.getCode().equals("CS")) {
-				symbol = new SimpleMarkerSymbol(Color.BLUE, 6,
-						SimpleMarkerSymbol.STYLE.DIAMOND);
+				symbol = new PictureMarkerSymbol(this.getResources()
+						.getDrawable(R.drawable.cs_s));
 			} else if (spot.getCode().equals("TCC")) {
-				symbol = new SimpleMarkerSymbol(Color.CYAN, 6,
-						SimpleMarkerSymbol.STYLE.SQUARE);
+				symbol = new PictureMarkerSymbol(this.getResources()
+						.getDrawable(R.drawable.tcc_s));
 			} else if (spot.getCode().equals("MT")) {
-				symbol = new SimpleMarkerSymbol(Color.GREEN, 6,
-						SimpleMarkerSymbol.STYLE.DIAMOND);
+				symbol = new PictureMarkerSymbol(this.getResources()
+						.getDrawable(R.drawable.mt_s));
 			} else if (spot.getCode().equals("HC")) {
 				symbol = new SimpleMarkerSymbol(Color.YELLOW, 6,
 						SimpleMarkerSymbol.STYLE.SQUARE);
@@ -322,6 +328,15 @@ public class NavigationActivity extends Activity {
 						new Point(spot.getLon(), spot.getLat()), symbol,
 						new HashMap<String, Object>(), new InfoTemplate(
 								String.valueOf(spot.getID()), spot.getName()));
+				scenicSpotsLayer.addGraphic(g);
+			}
+			
+			if (!spot.getCode().equals("JDCR")) {
+				textsymbol = new TextSymbol(10, spot.getName(), Color.BLACK);
+				textsymbol.setHorizontalAlignment(HorizontalAlignment.LEFT);
+			}
+			if (textsymbol != null) {
+				Graphic g = new Graphic(new Point(spot.getLon() + 0.000015, spot.getLat()), textsymbol);
 				scenicSpotsLayer.addGraphic(g);
 			}
 		}
