@@ -195,7 +195,7 @@ public class NavigationActivity extends Activity {
 				routeLayer.removeAll();
 
 				RouteTask routeTask = new RouteTask(
-						"http://58.198.182.32/ArcGIS/rest/services/pathline/NAServer/Route",
+						"http://218.108.83.172/ArcGIS/rest/services/pathline/NAServer/Route",
 						mapView.toMapPoint(x, y), (Point) selectedScenicSpot
 								.getGeometry());
 				int errorCode = routeTask.Solve();
