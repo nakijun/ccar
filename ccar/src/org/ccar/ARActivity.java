@@ -1,165 +1,122 @@
 package org.ccar;
 
-import org.ccar.view.AROverlayView;
-import org.ccar.view.CameraPreview;
-import org.ccar.view.RadarView;
-import org.codehaus.jackson.JsonParser;
+import java.util.List;
+import java.util.concurrent.RejectedExecutionException;
 
-import android.app.Activity;
-import android.content.Context;
-import android.content.pm.PackageManager;
-import android.hardware.Camera;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
+import org.ccar.R;
+import org.ccar.app.CCARApplication;
+import org.ccar.app.GeoCalcUtil;
+import org.ccar.ar.ARData;
+import org.ccar.ar.AugmentedActivity;
+import org.ccar.ar.LocalDataSource;
+import org.ccar.ar.Marker;
+import org.ccar.data.DatabaseManager;
+
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.util.Log;
-import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
-import android.widget.FrameLayout;
+import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.widget.LinearLayout;
+import android.widget.Toast;
 
-/**
- * 增强现实
- * @author swansword
- * 
- */
-public class ARActivity extends Activity {
-    private CameraPreview mPreview; 		// 摄像头预览界面
-    private AROverlayView overlayView; 		// 叠加层
-    private RadarView radarView;			// 雷达图
-    private SensorManager sensorManager;	// 传感器管理器
-    LocationManager locationManager;		// 位置管理器
-    
-    float[] gravity = new float[3]; 	// 加速度计测量值
-    float[] geomagnetic = new float[3];	// 磁场传感器测量值
-    
+public class ARActivity extends AugmentedActivity {
+	private static final String TAG = "MainActivity";
+
+	private LocalDataSource localData;
+	private DatabaseManager dm;
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
+	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		// 设置全屏
-		requestWindowFeature(Window.FEATURE_NO_TITLE);
-		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-		setContentView(R.layout.ar);
-		
-		sensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
-		
-//		mCamera = getCameraInstance();
-		
-        FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
-        mPreview = new CameraPreview(this);
-        preview.addView(mPreview);
-        
-        FrameLayout overlay = (FrameLayout) findViewById(R.id.ar_overlay);
-        overlayView = new AROverlayView(this, sensorManager);
-        overlay.addView(overlayView);
-        
-        FrameLayout radar = (FrameLayout) findViewById(R.id.ar_radar);
-        radarView = new RadarView(this, sensorManager);
-        radar.addView(radarView);
-        
-        
-        sensorManager.registerListener(sensorEventListener, 
-				sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION), 
-				SensorManager.SENSOR_DELAY_NORMAL);
+		localData = new LocalDataSource(this.getResources());
+		CCARApplication ccarApplication = (CCARApplication) getApplication();
+		dm = ccarApplication.getDatabaseManager();
 	}
 
 	@Override
-	protected void onPause() {
-		super.onPause();
-		sensorManager.unregisterListener(sensorEventListener);
+	public void onStart() {
+		super.onStart();
+
+		Location last = ARData.getCurrentLocation();
+		updateData(last.getLatitude(), last.getLongitude(), last.getAltitude());
 	}
 
 	@Override
-	protected void onResume() {
-		super.onResume();
-		sensorManager.registerListener(sensorEventListener, 
-				sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), 
-				SensorManager.SENSOR_DELAY_NORMAL);
-		sensorManager.registerListener(sensorEventListener, 
-				sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD), 
-				SensorManager.SENSOR_DELAY_NORMAL);
-	}
-	
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.menu, menu);
+		return true;
 	}
 
-	/**
-	 * 传感器监听器
-	 */
-	private final SensorEventListener sensorEventListener = new SensorEventListener() {
-		
-		@Override
-		public void onSensorChanged(SensorEvent event) {
-			switch (event.sensor.getType()) {
-	        case Sensor.TYPE_ACCELEROMETER:
-	        	gravity = event.values.clone();
-	        case Sensor.TYPE_MAGNETIC_FIELD:
-	        	geomagnetic = event.values.clone();
-	            break;
-	        default:
-	            break;
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		Log.v(TAG, "onOptionsItemSelected() item=" + item);
+		switch (item.getItemId()) {
+		case R.id.showRadar:
+			showRadar = !showRadar;
+			item.setTitle(((showRadar) ? "Hide" : "Show") + " Radar");
+			break;
+		case R.id.showZoomBar:
+			showZoomBar = !showZoomBar;
+			item.setTitle(((showZoomBar) ? "Hide" : "Show") + " Zoom Bar");
+			zoomLayout.setVisibility((showZoomBar) ? LinearLayout.VISIBLE
+					: LinearLayout.GONE);
+			break;
+		case R.id.exit:
+			finish();
+			break;
+		}
+		return true;
+	}
+
+	@Override
+	public void onLocationChanged(Location location) {
+		super.onLocationChanged(location);
+
+		updateData(location.getLatitude(), location.getLongitude(),
+				location.getAltitude());
+	}
+
+	@Override
+	protected void markerTouched(Marker marker) {
+		Toast t = Toast.makeText(getApplicationContext(), marker.getName(),
+				Toast.LENGTH_SHORT);
+		t.setGravity(Gravity.CENTER, 0, 0);
+		t.show();
+	}
+
+	@Override
+	protected void updateDataOnZoom() {
+		super.updateDataOnZoom();
+		Location last = ARData.getCurrentLocation();
+		updateData(last.getLatitude(), last.getLongitude(), last.getAltitude());
+	}
+
+	private void updateData(final double lat, final double lon, final double alt) {
+		try {
+			// exeService.execute(new Runnable() {
+			//
+			// public void run() {
+			// for (NetworkDataSource source : sources.values())
+			// download(source, lat, lon, alt);
+			// }
+			// });
+			
+			if (localData == null) {
+				return;
 			}
 			
-			float[] values = new float[3]; 
-	        float[] R = new float[9]; 
-	        SensorManager.getRotationMatrix(R, null, gravity, geomagnetic); 
-	        SensorManager.getOrientation(R, values); 
-	        
-//	        values[0] = (float) Math.toDegrees(values[0]); 
-//	        values[1] = (float) Math.toDegrees(values[1]); 
-//	        values[2] = (float) Math.toDegrees(values[2]); 
-//	        System.out.println(values[0] + ", " + values[1] + ", " + values[2]);
-//	        if ((int)values[0] != 0)
-	        overlayView.setOrientation(values);
-	        radarView.setOrientation(values);
+			double[] xy = GeoCalcUtil.WGS2flat(lon, lat);
+			List<Marker> markers = localData.getMarkers(dm, xy[0], xy[1],
+					ARData.getRadius() * 1000);
+			ARData.addMarkers(markers);
+		} catch (RejectedExecutionException rej) {
+			Log.w(TAG, "Not running new download Runnable, queue is full.");
+		} catch (Exception e) {
+			Log.e(TAG, "Exception running download Runnable.", e);
 		}
-		
-		@Override
-		public void onAccuracyChanged(Sensor sensor, int accuracy) {
-			// TODO Auto-generated method stub
-			
-		}
-	};
-	
-	/**
-	 * 获取当前位置
-	 */
-	private void receiveCurrentLocation() {
-		locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);	
-		
-		// 分别通过基站、GPS获取当前位置
-//		locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 600, 100, locationListener);
-		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 100, locationListener);
 	}
-	
-	private final LocationListener locationListener = new LocationListener() {
-		
-		@Override
-		public void onStatusChanged(String provider, int status, Bundle extras) {
-		}
-		
-		@Override
-		public void onProviderEnabled(String provider) {
-		}
-		
-		@Override
-		public void onProviderDisabled(String provider) {
-		}
-		
-		@Override
-		public void onLocationChanged(Location location) {
-			radarView.setLocation(location);
-		}
-	};
 }
