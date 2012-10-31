@@ -223,8 +223,9 @@ public class NavigationActivity extends Activity {
 				callout.show((Point) g.getGeometry());
 			} else {
 				selectedScenicSpot = null;
-				if (callout.isShowing())
+				if (callout != null && callout.isShowing()) {
 					callout.hide();
+				}
 			}
 		}
 	};
