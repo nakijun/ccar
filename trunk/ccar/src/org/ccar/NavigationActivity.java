@@ -55,6 +55,11 @@ public class NavigationActivity extends Activity {
 	 * 景点图层。
 	 */
 	private GraphicsLayer scenicSpotsLayer;
+	
+	/**
+	 * 景点文字标注图层
+	 */
+	private GraphicsLayer scenicSoptsLabelLayer;
 
 	/**
 	 * 路径图层。
@@ -139,6 +144,10 @@ public class NavigationActivity extends Activity {
 		// 添加景点图层。
 		scenicSpotsLayer = new GraphicsLayer();
 		mapView.addLayer(scenicSpotsLayer);
+		
+		// 添加景点文字标注图层
+		scenicSoptsLabelLayer = new GraphicsLayer();
+		mapView.addLayer(scenicSoptsLabelLayer);
 
 		// 添加路径图层。
 		routeLayer = new GraphicsLayer();
@@ -338,7 +347,7 @@ public class NavigationActivity extends Activity {
 			}
 			if (textsymbol != null) {
 				Graphic g = new Graphic(new Point(spot.getLon() + 0.000015, spot.getLat()), textsymbol);
-				scenicSpotsLayer.addGraphic(g);
+				scenicSoptsLabelLayer.addGraphic(g);
 			}
 		}
 	}

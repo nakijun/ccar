@@ -18,6 +18,18 @@
 			>
 			
 		</com.esri.android.map.MapView>
+		
+        <ImageButton android:id="@+id/ar_button"
+            android:contentDescription="AR"
+            android:src="@drawable/ar"
+            android:layout_alignParentRight="true" 
+		    android:layout_alignParentTop="true"
+		    android:layout_marginRight="10dip"
+		    android:layout_marginTop="10dip"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:padding="0dip" 
+		    android:background="#00ffffff" />"
 
 		<Button android:id="@+id/map_zoomin_button"
 		    android:layout_alignParentRight="true" 
