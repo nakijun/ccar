@@ -2,17 +2,20 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    android:layout_gravity="center_vertical"
     android:orientation="horizontal"
     android:paddingLeft="10dip" android:paddingRight="10dip"
     android:paddingTop="1dip" android:paddingBottom="1dip">
     <TextView android:id="@+id/spotcatalog_name"
-        android:layout_width="160dip" 
-        android:layout_height="50dip"
-        android:textSize="10pt"
+        android:layout_width="200dip" 
+        android:layout_height="wrap_content"
+        android:paddingTop="10dip"
+        android:paddingBottom="10dip"
+        android:textSize="8pt"
         android:singleLine="true" />
     <TextView
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_height="wrap_content"
         android:gravity="right"
         android:textSize="10pt"
         android:text=">" />
