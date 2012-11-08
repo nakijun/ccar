@@ -3,6 +3,7 @@
     <string name="app_name">ccar</string>
     <string name="index">首页</string>
     <string name="exit">退出</string>
+    <string name="spotCatalog">目录</string>
     <string name="spotlist">景点列表</string>
     <string name="AR">增强现实</string>
     <string name="navigation">景区导航</string>
