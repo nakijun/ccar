@@ -25,8 +25,12 @@ import com.esri.core.symbol.TextSymbol;
 import com.esri.core.symbol.TextSymbol.HorizontalAlignment;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -35,6 +39,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,9 +51,11 @@ import android.widget.Toast;
  */
 public class NavigationActivity extends Activity {
 	private DatabaseManager dm;
+	private LocationManager locationManager;
 	private MapView mapView;
 	private Button btnZoomIn;
 	private Button btnZoomOut;
+	private ImageButton imgbtnAR;
 	private Callout callout;
 
 	/**
@@ -65,6 +72,16 @@ public class NavigationActivity extends Activity {
 	 * 路径图层。
 	 */
 	private GraphicsLayer routeLayer;
+	
+	/**
+	 * 当前位置图层
+	 */
+	private GraphicsLayer currentLocationLayer;
+	
+	/**
+	 * 当前位置点
+	 */
+	private Graphic currentLocationPoint;
 
 	/**
 	 * 当前被选中的景点。
@@ -81,7 +98,9 @@ public class NavigationActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.navigation);
-
+		
+		
+		
 		// 初始化DatabaseManager
 		CCARApplication ccarApplication = (CCARApplication) getApplication();
 		dm = ccarApplication.getDatabaseManager();
@@ -90,10 +109,14 @@ public class NavigationActivity extends Activity {
 		mapView = (MapView) findViewById(R.id.map);
 		btnZoomIn = (Button) findViewById(R.id.map_zoomin_button);
 		btnZoomOut = (Button) findViewById(R.id.map_zoomout_button);
+		imgbtnAR = (ImageButton)findViewById(R.id.ar_imgbutton);
 
 		setControlProperty(); // 设置控件属性
 
 		showScenicSpot();
+		
+		// 获取当前位置
+		receiveCurrentLocation();
 	}
 
 	@Override
@@ -131,6 +154,13 @@ public class NavigationActivity extends Activity {
 				mapView.zoomout();
 			}
 		});
+		imgbtnAR.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View paramView) {
+				Intent intent = new Intent(NavigationActivity.this, ARActivity.class);
+				startActivity(intent);
+			}
+		});
 	}
 
 	/**
@@ -155,6 +185,10 @@ public class NavigationActivity extends Activity {
 		SimpleRenderer renderer = new SimpleRenderer(symbol);
 		routeLayer.setRenderer(renderer);
 		mapView.addLayer(routeLayer);
+		
+		// 添加当前位置图层
+		currentLocationLayer = new GraphicsLayer();
+		mapView.addLayer(currentLocationLayer);
 
 		// 设置地图视图事件。
 		mapView.setOnSingleTapListener(m_onSingleTapListener);
@@ -351,4 +385,55 @@ public class NavigationActivity extends Activity {
 			}
 		}
 	}
+	
+	/**
+	 * 获取当前位置
+	 */
+	private void receiveCurrentLocation() {
+		locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);	
+		
+		//  尝试获取之前得到的位置数据，如果有，先使用该数据
+		Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+		if (lastKnownLocation != null) {
+			showCurrentLocation(lastKnownLocation);
+		} else {
+			lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+			if (lastKnownLocation != null) {
+				showCurrentLocation(lastKnownLocation);
+			}
+		}
+		
+		// 分别通过基站、GPS获取当前位置
+		locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 600, 10, locationListener);
+		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5, 10, locationListener);
+	}
+	
+	private void showCurrentLocation(Location location) {
+		Symbol symbol = new SimpleMarkerSymbol(Color.BLACK, 10,
+				SimpleMarkerSymbol.STYLE.CIRCLE);
+		currentLocationPoint = new Graphic(new Point(location.getLongitude(), location.getLatitude()), symbol);
+		if (currentLocationLayer.getNumberOfGraphics() == 0) {
+			currentLocationLayer.addGraphic(currentLocationPoint);
+		}
+	}
+	
+	/**
+	 *  位置监听器
+	 */
+	private final LocationListener locationListener = new LocationListener() {
+		@Override
+		public void onStatusChanged(String provider, int status, Bundle extras) {}
+		
+		@Override
+		public void onProviderEnabled(String provider) {}
+		
+		@Override
+		public void onProviderDisabled(String provider) {}
+		
+		@Override
+		public void onLocationChanged(Location location) {
+			// 位置改变时更新景点列表
+			showCurrentLocation(location);
+		}
+	};
 }
