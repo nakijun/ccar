@@ -28,6 +28,7 @@ import android.widget.SimpleAdapter;
 public class SpotListActivity extends ListActivity {
 	DatabaseManager dm;
 	LocationManager locationManager;
+	String typeCode; // 传入的类别编码
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +38,13 @@ public class SpotListActivity extends ListActivity {
 		// 初始化DatabaseManager
 		CCARApplication ccarApplication = (CCARApplication) getApplication();
 		dm = ccarApplication.getDatabaseManager();
+		
+		// 获取传入的景点类别编码
+		Intent intent = getIntent();
+		typeCode = intent.getStringExtra("spot_type");
+		
+		
+		setScenicSpotList(null);
 		
 		// 获取当前位置
 		receiveCurrentLocation();
@@ -61,25 +69,31 @@ public class SpotListActivity extends ListActivity {
 	 */
 	private void setScenicSpotList(Location location) {
 		ArrayList<HashMap<String, String>> list = new ArrayList<HashMap<String, String>>(); // 景点列表
+		List<ScenicSpot> spotList = new ArrayList<ScenicSpot>();
+		if (location != null) {
+			// 将经纬度转换为平面坐标
+			double[] xy = GeoCalcUtil.WGS2flat(location.getLongitude(), location.getLatitude());
 		
-		// 将经纬度转换为平面坐标
-		double[] xy = GeoCalcUtil.WGS2flat(location.getLongitude(), location.getLatitude());
-		
-		// 查询数据库返回景点列表，按距离排序
-		List<ScenicSpot> spotList = dm.getScenicSpots(null, String.valueOf(xy[0]), String.valueOf(xy[1]));
-		
+			// 查询数据库返回景点列表，按距离排序
+			spotList = dm.getScenicSpot(typeCode, String.valueOf(xy[0]), String.valueOf(xy[1]));
+		} else {
+			spotList = dm.getScenicSpot(typeCode, null, null);
+		}
 		// 构造景点列表数据
 		for (ScenicSpot spot : spotList) {
 			HashMap<String, String> map = new HashMap<String, String>();
 			map.put("spot_id", String.valueOf(spot.getID()));
 			map.put("spot_name", spot.getName());
 			
-			// 根据返回的景点的经纬度计算与当前位置的距离
-			double dis = GeoCalcUtil.CalcDistance(location.getLongitude(), location.getLatitude(), spot.getLon(), spot.getLat());
+			if (location != null) {
+				// 根据返回的景点的经纬度计算与当前位置的距离
+				double dis = GeoCalcUtil.CalcDistance(location.getLongitude(), location.getLatitude(), spot.getLon(), spot.getLat());
 			
-			// 距离数据精度保留到10米
-			map.put("spot_dis", String.valueOf(Math.round(dis / 10) * 10)+"m"); 
-			
+				// 距离数据精度保留到10米
+				map.put("spot_dis", String.valueOf(Math.round(dis / 10) * 10)+"m"); 
+			} else {
+				map.put("spot_dis", "");
+			}
 			list.add(map);
 		}
 

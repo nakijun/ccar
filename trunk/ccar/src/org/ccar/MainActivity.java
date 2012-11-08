@@ -75,7 +75,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		Intent i;
 		switch (v.getId()) {
 		case R.id.spotlist_button:
-			i = new Intent(this, SpotListActivity.class);
+			i = new Intent(this, SpotCatalogActivity.class);
 			startActivity(i);
 			break;
 		case R.id.ar_button:
