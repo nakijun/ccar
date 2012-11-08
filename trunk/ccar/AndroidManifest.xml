@@ -27,6 +27,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".SpotCatalogActivity"
+            	  android:label="@string/spotCatalog"></activity>
 		<activity android:name=".SpotListActivity"
 		    	  android:label="@string/spotlist"></activity>
 		<activity android:name=".ARActivity"
