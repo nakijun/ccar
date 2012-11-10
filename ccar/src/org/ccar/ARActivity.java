@@ -97,20 +97,12 @@ public class ARActivity extends AugmentedActivity {
 
 	private void updateData(final double lat, final double lon, final double alt) {
 		try {
-			// exeService.execute(new Runnable() {
-			//
-			// public void run() {
-			// for (NetworkDataSource source : sources.values())
-			// download(source, lat, lon, alt);
-			// }
-			// });
-			
 			if (localData == null) {
 				return;
 			}
 			
-//			double[] xy = GeoCalcUtil.WGS2flat(lon, lat);
-			double[] xy = GeoCalcUtil.WGS2flat(lon - 1.4032279, lat - 0.76549289);
+			double[] xy = GeoCalcUtil.WGS2flat(lon, lat);
+//			double[] xy = GeoCalcUtil.WGS2flat(lon - 1.4032279, lat - 0.76549289);
 			List<Marker> markers = localData.getMarkers(dm, xy[0], xy[1],
 					ARData.getRadius() * 1000);
 			ARData.addMarkers(markers);
