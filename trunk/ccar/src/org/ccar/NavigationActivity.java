@@ -24,6 +24,7 @@ import com.esri.core.symbol.SimpleMarkerSymbol;
 import com.esri.core.symbol.Symbol;
 import com.esri.core.symbol.TextSymbol;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -62,7 +63,7 @@ public class NavigationActivity extends Activity {
 	 * 景点图层。
 	 */
 	private GraphicsLayer scenicSpotsLayer;
-	
+
 	/**
 	 * 景点文字标注图层
 	 */
@@ -72,12 +73,12 @@ public class NavigationActivity extends Activity {
 	 * 路径图层。
 	 */
 	private GraphicsLayer routeLayer;
-	
+
 	/**
 	 * 当前位置图层
 	 */
 	private GraphicsLayer currentLocationLayer;
-	
+
 	/**
 	 * 当前位置点
 	 */
@@ -98,7 +99,7 @@ public class NavigationActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.navigation);
-		
+
 		// 初始化DatabaseManager
 		CCARApplication ccarApplication = (CCARApplication) getApplication();
 		dm = ccarApplication.getDatabaseManager();
@@ -107,15 +108,14 @@ public class NavigationActivity extends Activity {
 		mapView = (MapView) findViewById(R.id.map);
 		btnZoomIn = (Button) findViewById(R.id.map_zoomin_button);
 		btnZoomOut = (Button) findViewById(R.id.map_zoomout_button);
-		imgbtnAR = (ImageButton)findViewById(R.id.ar_imgbutton);
+		imgbtnAR = (ImageButton) findViewById(R.id.ar_imgbutton);
 
 		setControlProperty(); // 设置控件属性
 
-		//showScenicSpot();	// 显示景点
-//		setLabelVisible();  // 默认设置Label不可见
-//		receiveCurrentLocation();// 获取并显示当前位置
-		
-		
+		// showScenicSpot(); // 显示景点
+		// setLabelVisible(); // 默认设置Label不可见
+		// receiveCurrentLocation();// 获取并显示当前位置
+
 	}
 
 	@Override
@@ -158,11 +158,18 @@ public class NavigationActivity extends Activity {
 		imgbtnAR.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View paramView) {
-				Intent intent = new Intent(NavigationActivity.this, ARActivity.class);
+				Intent intent = new Intent(NavigationActivity.this,
+						ARActivity.class);
 				startActivity(intent);
 			}
 		});
 	}
+
+	private SimpleLineSymbol routeSymbol;
+
+	private PictureMarkerSymbol startMarkerSymbol;
+
+	private PictureMarkerSymbol endMarkerSymbol;
 
 	/**
 	 * 设置地图视图以及地图图层。
@@ -175,34 +182,44 @@ public class NavigationActivity extends Activity {
 		// 添加景点图层。
 		scenicSpotsLayer = new GraphicsLayer();
 		mapView.addLayer(scenicSpotsLayer);
-		
+
 		// 添加景点文字标注图层
 		scenicSoptsLabelLayer = new GraphicsLayer();
 		mapView.addLayer(scenicSoptsLabelLayer);
 
 		// 添加路径图层。
 		routeLayer = new GraphicsLayer();
-		SimpleLineSymbol symbol = new SimpleLineSymbol(Color.BLUE, 2);
-		SimpleRenderer renderer = new SimpleRenderer(symbol);
-		routeLayer.setRenderer(renderer);
 		mapView.addLayer(routeLayer);
-		
+
+		// 符号初始化。
+		if (routeSymbol == null) {
+			routeSymbol = new SimpleLineSymbol(Color.BLUE, 2); // 路径符号。
+		}
+		if (startMarkerSymbol == null) {
+			startMarkerSymbol = new PictureMarkerSymbol(this.getResources()
+					.getDrawable(R.drawable.start)); // 起点符号。
+		}
+		if (endMarkerSymbol == null) {
+			endMarkerSymbol = new PictureMarkerSymbol(this.getResources()
+					.getDrawable(R.drawable.end)); // 终点符号。
+		}
+
 		// 添加当前位置图层
 		currentLocationLayer = new GraphicsLayer();
 		mapView.addLayer(currentLocationLayer);
 
 		// 设置地图视图事件。
 		mapView.setOnSingleTapListener(m_onSingleTapListener);
-		
-//		mapView.setOnZoomListener(m_onZoomListener);
-		
+
+		// mapView.setOnZoomListener(m_onZoomListener);
+
 		mapView.setOnStatusChangedListener(new OnStatusChangedListener() {
-			
+
 			@Override
 			public void onStatusChanged(Object paramObject, STATUS paramSTATUS) {
 				if (paramSTATUS == STATUS.INITIALIZED) {
-					showScenicSpot();	// 显示景点
-//					setLabelVisible();  // 默认设置Label不可见
+					showScenicSpot(); // 显示景点
+					// setLabelVisible(); // 默认设置Label不可见
 					receiveCurrentLocation();// 获取并显示当前位置
 				}
 			}
@@ -262,8 +279,16 @@ public class NavigationActivity extends Activity {
 					Toast.makeText(NavigationActivity.this, errorCode,
 							Toast.LENGTH_SHORT);
 				} else {
-					Graphic route = new Graphic(routeTask.getResult(), null);
+					Graphic route = new Graphic(routeTask.getResult(),
+							routeSymbol);
 					routeLayer.addGraphic(route);
+					Graphic startMarker = new Graphic(mapView.toMapPoint(x, y),
+							startMarkerSymbol);
+					routeLayer.addGraphic(startMarker);
+					Graphic endMarker = new Graphic(
+							(Point) selectedScenicSpot.getGeometry(),
+							endMarkerSymbol);
+					routeLayer.addGraphic(endMarker);
 				}
 
 				selectedScenicSpot = null;
@@ -288,16 +313,16 @@ public class NavigationActivity extends Activity {
 			}
 		}
 	};
-	
-//	private final OnZoomListener m_onZoomListener = new OnZoomListener() {		
-//		@Override
-//		public void preAction(float pivotX, float pivotY, double factor) {
-//		}		
-//		@Override
-//		public void postAction(float pivotX, float pivotY, double factor) {
-//			setLabelVisible();
-//		}
-//	};
+
+	// private final OnZoomListener m_onZoomListener = new OnZoomListener() {
+	// @Override
+	// public void preAction(float pivotX, float pivotY, double factor) {
+	// }
+	// @Override
+	// public void postAction(float pivotX, float pivotY, double factor) {
+	// setLabelVisible();
+	// }
+	// };
 
 	/**
 	 * 加载Callout
@@ -339,29 +364,40 @@ public class NavigationActivity extends Activity {
 				callout = mapView.getCallout();
 				callout.hide();
 //				isNavigating = true;
-				
+
 				navigate();
 			}
 		});
 
 		return view;
 	}
-	
+
 	private void navigate() {
-		Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+		Location location = locationManager
+				.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 		routeLayer.removeAll();
 
 		RouteTask routeTask = new RouteTask(
 				"http://218.108.83.172/ArcGIS/rest/services/pathline/NAServer/Route",
-				new Point(location.getLongitude(), location.getLatitude()), (Point) selectedScenicSpot
-						.getGeometry());
+				new Point(location.getLongitude(), location.getLatitude()),
+				(Point) selectedScenicSpot.getGeometry());
 		int errorCode = routeTask.Solve();
 		if (errorCode > 0) {
 			Toast.makeText(NavigationActivity.this, errorCode,
 					Toast.LENGTH_SHORT);
 		} else {
-			Graphic route = new Graphic(routeTask.getResult(), null);
+			Graphic route = new Graphic(routeTask.getResult(), routeSymbol);
 			routeLayer.addGraphic(route);
+			Point point = mapView.toScreenPoint(new Point(location
+					.getLongitude(), location.getLatitude()));
+			Graphic startMarker = new Graphic(mapView.toMapPoint(new Point(
+					point.getX(), point.getY() - 16)), startMarkerSymbol);
+			routeLayer.addGraphic(startMarker);
+			point = mapView.toScreenPoint((Point) selectedScenicSpot
+					.getGeometry());
+			Graphic endMarker = new Graphic(mapView.toMapPoint(new Point(point
+					.getX(), point.getY() - 16)), endMarkerSymbol);
+			routeLayer.addGraphic(endMarker);
 		}
 
 		selectedScenicSpot = null;
@@ -385,8 +421,8 @@ public class NavigationActivity extends Activity {
 				symbol = new PictureMarkerSymbol(this.getResources()
 						.getDrawable(R.drawable.jd_s));
 			} else if (spot.getCode().equals("JDCR")) {
-//				symbol = new SimpleMarkerSymbol(Color.GREEN, 6,
-//						SimpleMarkerSymbol.STYLE.CIRCLE);
+				// symbol = new SimpleMarkerSymbol(Color.GREEN, 6,
+				// SimpleMarkerSymbol.STYLE.CIRCLE);
 			} else if (spot.getCode().equals("JZ")) {
 				symbol = new SimpleMarkerSymbol(Color.CYAN, 6,
 						SimpleMarkerSymbol.STYLE.CIRCLE);
@@ -423,79 +459,90 @@ public class NavigationActivity extends Activity {
 								String.valueOf(spot.getID()), spot.getName()));
 				scenicSpotsLayer.addGraphic(g);
 			}
-			
-//			if (!spot.getCode().equals("JDCR")) {
-//				textsymbol = new TextSymbol(10, spot.getName(), Color.BLACK);
-//				textsymbol.setHorizontalAlignment(HorizontalAlignment.LEFT);
-//				Map<String, Object>  map = new HashMap<String, Object>();
-//				map.put("spotid", spot.getID());
-//				map.put("spotcode", spot.getCode());
-//				map.put("spotname", spot.getName());
-//				Point p = mapView.toScreenPoint(new Point(spot.getLon(), spot.getLat()));
-//				Graphic g = new Graphic(new Point(spot.getLon() + 0.000015, spot.getLat()), textsymbol,
-//						map, new InfoTemplate(
-//								String.valueOf(spot.getID()), spot.getName()));
-//				scenicSoptsLabelLayer.setGraphicVisible(g.getUid(), false);
-//				scenicSoptsLabelLayer.addGraphic(g);
-//			}
+
+			// if (!spot.getCode().equals("JDCR")) {
+			// textsymbol = new TextSymbol(10, spot.getName(), Color.BLACK);
+			// textsymbol.setHorizontalAlignment(HorizontalAlignment.LEFT);
+			// Map<String, Object> map = new HashMap<String, Object>();
+			// map.put("spotid", spot.getID());
+			// map.put("spotcode", spot.getCode());
+			// map.put("spotname", spot.getName());
+			// Point p = mapView.toScreenPoint(new Point(spot.getLon(),
+			// spot.getLat()));
+			// Graphic g = new Graphic(new Point(spot.getLon() + 0.000015,
+			// spot.getLat()), textsymbol,
+			// map, new InfoTemplate(
+			// String.valueOf(spot.getID()), spot.getName()));
+			// scenicSoptsLabelLayer.setGraphicVisible(g.getUid(), false);
+			// scenicSoptsLabelLayer.addGraphic(g);
+			// }
 		}
 	}
-	
+
 	/**
 	 * 获取当前位置
 	 */
 	private void receiveCurrentLocation() {
-		locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);	
-		
-		//  尝试获取之前得到的位置数据，如果有，先使用该数据
-		Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+		// 尝试获取之前得到的位置数据，如果有，先使用该数据
+		Location lastKnownLocation = locationManager
+				.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 		if (lastKnownLocation != null) {
 			showCurrentLocation(lastKnownLocation);
 		} else {
-			lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+			lastKnownLocation = locationManager
+					.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 			if (lastKnownLocation != null) {
 				showCurrentLocation(lastKnownLocation);
 			}
 		}
-		
+
 		// 分别通过基站、GPS获取当前位置
-		locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 600, 10, locationListener);
-		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5, 10, locationListener);
+		locationManager.requestLocationUpdates(
+				LocationManager.NETWORK_PROVIDER, 600, 10, locationListener);
+		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5,
+				10, locationListener);
 	}
-	
+
 	/**
 	 * 显示当前位置
+	 * 
 	 * @param location
 	 */
 	private void showCurrentLocation(Location location) {
 		Symbol symbol = new SimpleMarkerSymbol(Color.BLACK, 10,
 				SimpleMarkerSymbol.STYLE.CIRCLE);
-		currentLocationPoint = new Graphic(new Point(location.getLongitude(), location.getLatitude()), symbol);
+		currentLocationPoint = new Graphic(new Point(location.getLongitude(),
+				location.getLatitude()), symbol);
 		if (currentLocationLayer.getNumberOfGraphics() == 0) {
 			currentLocationLayer.addGraphic(currentLocationPoint);
 		}
 	}
-	
+
 	/**
-	 *  位置监听器
+	 * 位置监听器
 	 */
 	private final LocationListener locationListener = new LocationListener() {
 		@Override
-		public void onStatusChanged(String provider, int status, Bundle extras) {}
-		
+		public void onStatusChanged(String provider, int status, Bundle extras) {
+		}
+
 		@Override
-		public void onProviderEnabled(String provider) {}
-		
+		public void onProviderEnabled(String provider) {
+		}
+
 		@Override
-		public void onProviderDisabled(String provider) {}
-		
+		public void onProviderDisabled(String provider) {
+		}
+
 		@Override
 		public void onLocationChanged(Location location) {
 			// 位置改变时更新景点列表
 			showCurrentLocation(location);
 		}
 	};
-	
+
 	private void setLabelVisible() {
 		if (mapView.getScale() < 5000) {
 			for (int gid : scenicSoptsLabelLayer.getGraphicIDs()) {
@@ -506,6 +553,6 @@ public class NavigationActivity extends Activity {
 				scenicSoptsLabelLayer.setGraphicVisible(gid, false);
 			}
 		}
-			 
+
 	}
 }
