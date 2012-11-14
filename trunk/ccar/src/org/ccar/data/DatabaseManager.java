@@ -108,13 +108,16 @@ public class DatabaseManager {
 		return true;
 
 	}
-	
-	
+
 	/**
 	 * 根据类型获取景点记录
-	 * @param code 类型编码
-	 * @param x 当前位置的 X 坐标。
-	 * @param y 当前位置的 Y 坐标。
+	 * 
+	 * @param code
+	 *            类型编码
+	 * @param x
+	 *            当前位置的 X 坐标。
+	 * @param y
+	 *            当前位置的 Y 坐标。
 	 * @return 符合条件的所有记录
 	 */
 	public List<ScenicSpot> getScenicSpot(String code, String x, String y) {
@@ -135,7 +138,7 @@ public class DatabaseManager {
 		if (code != null) {
 			sql = sql + " where code = '" + code + "'";
 		}
-		sql = sql + " order by " + getOrderBy("", x, y);
+		sql = sql + " order by " + getOrderBy(null, x, y);
 		Cursor cursor = dbHelper.getReadableDatabase().rawQuery(sql, null);
 		while (cursor.moveToNext()) {
 			ScenicSpot scenicSpot = constructInstance(cursor, hasDistance);
