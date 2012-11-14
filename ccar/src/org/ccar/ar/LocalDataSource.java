@@ -32,12 +32,10 @@ public class LocalDataSource extends DataSource {
 
 		icon = BitmapFactory.decodeResource(res, R.drawable.ic_launcher);
 
-		icons.put("CK", BitmapFactory.decodeResource(res, R.drawable.ck));
 		icons.put("CS", BitmapFactory.decodeResource(res, R.drawable.cs));
 		icons.put("CY", BitmapFactory.decodeResource(res, R.drawable.cy));
 		icons.put("HC", BitmapFactory.decodeResource(res, R.drawable.hc));
 		icons.put("JD", BitmapFactory.decodeResource(res, R.drawable.jd));
-		icons.put("JZ", BitmapFactory.decodeResource(res, R.drawable.jz));
 		icons.put("MT", BitmapFactory.decodeResource(res, R.drawable.mt));
 		icons.put("QL", BitmapFactory.decodeResource(res, R.drawable.ql));
 		icons.put("RK", BitmapFactory.decodeResource(res, R.drawable.rk));

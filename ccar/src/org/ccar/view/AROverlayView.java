@@ -102,13 +102,11 @@ public class AROverlayView extends View implements Runnable {
 	 */
 	private void initIconList() {
 		iconList = new ArrayList<Bitmap>();
-		iconList.add(BitmapFactory.decodeResource(this.getResources(), R.drawable.ck));
 		iconList.add(BitmapFactory.decodeResource(this.getResources(), R.drawable.cs));
 		iconList.add(BitmapFactory.decodeResource(this.getResources(), R.drawable.cy));
 		iconList.add(BitmapFactory.decodeResource(this.getResources(), R.drawable.fw));
 		iconList.add(BitmapFactory.decodeResource(this.getResources(), R.drawable.hc));
 		iconList.add(BitmapFactory.decodeResource(this.getResources(), R.drawable.jd));
-		iconList.add(BitmapFactory.decodeResource(this.getResources(), R.drawable.jz));
 		iconList.add(BitmapFactory.decodeResource(this.getResources(), R.drawable.mt));
 		iconList.add(BitmapFactory.decodeResource(this.getResources(), R.drawable.ql));
 		iconList.add(BitmapFactory.decodeResource(this.getResources(), R.drawable.rk));

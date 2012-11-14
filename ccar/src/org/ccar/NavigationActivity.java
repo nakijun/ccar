@@ -17,14 +17,12 @@ import com.esri.android.map.event.OnSingleTapListener;
 import com.esri.android.map.event.OnStatusChangedListener;
 import com.esri.core.geometry.Point;
 import com.esri.core.map.Graphic;
-import com.esri.core.renderer.SimpleRenderer;
 import com.esri.core.symbol.PictureMarkerSymbol;
 import com.esri.core.symbol.SimpleLineSymbol;
 import com.esri.core.symbol.SimpleMarkerSymbol;
 import com.esri.core.symbol.Symbol;
 import com.esri.core.symbol.TextSymbol;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -363,7 +361,7 @@ public class NavigationActivity extends Activity {
 			public void onClick(View v) {
 				callout = mapView.getCallout();
 				callout.hide();
-//				isNavigating = true;
+				// isNavigating = true;
 
 				navigate();
 			}
@@ -388,15 +386,12 @@ public class NavigationActivity extends Activity {
 		} else {
 			Graphic route = new Graphic(routeTask.getResult(), routeSymbol);
 			routeLayer.addGraphic(route);
-			Point point = mapView.toScreenPoint(new Point(location
-					.getLongitude(), location.getLatitude()));
-			Graphic startMarker = new Graphic(mapView.toMapPoint(new Point(
-					point.getX(), point.getY() - 16)), startMarkerSymbol);
+			Graphic startMarker = new Graphic(new Point(
+					location.getLongitude(), location.getLatitude()),
+					startMarkerSymbol);
 			routeLayer.addGraphic(startMarker);
-			point = mapView.toScreenPoint((Point) selectedScenicSpot
-					.getGeometry());
-			Graphic endMarker = new Graphic(mapView.toMapPoint(new Point(point
-					.getX(), point.getY() - 16)), endMarkerSymbol);
+			Graphic endMarker = new Graphic(
+					(Point) selectedScenicSpot.getGeometry(), endMarkerSymbol);
 			routeLayer.addGraphic(endMarker);
 		}
 
@@ -409,73 +404,10 @@ public class NavigationActivity extends Activity {
 	private void showScenicSpot() {
 		List<ScenicSpot> spotList = dm.getScenicSpots();
 		for (ScenicSpot spot : spotList) {
-			Symbol symbol = null;
-			TextSymbol textsymbol = null;
-			if (spot.getCode().equals("RK")) {
-				symbol = new PictureMarkerSymbol(this.getResources()
-						.getDrawable(R.drawable.rk_s));
-			} else if (spot.getCode().equals("CK")) {
-				symbol = new PictureMarkerSymbol(this.getResources()
-						.getDrawable(R.drawable.ck_s));
-			} else if (spot.getCode().equals("JD")) {
-				symbol = new PictureMarkerSymbol(this.getResources()
-						.getDrawable(R.drawable.jd_s));
-			} else if (spot.getCode().equals("JDCR")) {
-				// symbol = new SimpleMarkerSymbol(Color.GREEN, 6,
-				// SimpleMarkerSymbol.STYLE.CIRCLE);
-			} else if (spot.getCode().equals("JZ")) {
-				symbol = new SimpleMarkerSymbol(Color.CYAN, 6,
-						SimpleMarkerSymbol.STYLE.CIRCLE);
-			} else if (spot.getCode().equals("QL")) {
-				symbol = new SimpleMarkerSymbol(Color.YELLOW, 6,
-						SimpleMarkerSymbol.STYLE.CIRCLE);
-			} else if (spot.getCode().equals("CY")) {
-				symbol = new PictureMarkerSymbol(this.getResources()
-						.getDrawable(R.drawable.cy_s));
-			} else if (spot.getCode().equals("FW")) {
-				symbol = new PictureMarkerSymbol(this.getResources()
-						.getDrawable(R.drawable.fw_s));
-			} else if (spot.getCode().equals("ZXC")) {
-				symbol = new SimpleMarkerSymbol(Color.RED, 8,
-						SimpleMarkerSymbol.STYLE.CROSS);
-			} else if (spot.getCode().equals("CS")) {
-				symbol = new PictureMarkerSymbol(this.getResources()
-						.getDrawable(R.drawable.cs_s));
-			} else if (spot.getCode().equals("TCC")) {
-				symbol = new PictureMarkerSymbol(this.getResources()
-						.getDrawable(R.drawable.tcc_s));
-			} else if (spot.getCode().equals("MT")) {
-				symbol = new PictureMarkerSymbol(this.getResources()
-						.getDrawable(R.drawable.mt_s));
-			} else if (spot.getCode().equals("HC")) {
-				symbol = new SimpleMarkerSymbol(Color.YELLOW, 6,
-						SimpleMarkerSymbol.STYLE.SQUARE);
-			}
-
-			if (symbol != null) {
-				Graphic g = new Graphic(
-						new Point(spot.getLon(), spot.getLat()), symbol,
-						new HashMap<String, Object>(), new InfoTemplate(
-								String.valueOf(spot.getID()), spot.getName()));
-				scenicSpotsLayer.addGraphic(g);
-			}
-
-			// if (!spot.getCode().equals("JDCR")) {
-			// textsymbol = new TextSymbol(10, spot.getName(), Color.BLACK);
-			// textsymbol.setHorizontalAlignment(HorizontalAlignment.LEFT);
-			// Map<String, Object> map = new HashMap<String, Object>();
-			// map.put("spotid", spot.getID());
-			// map.put("spotcode", spot.getCode());
-			// map.put("spotname", spot.getName());
-			// Point p = mapView.toScreenPoint(new Point(spot.getLon(),
-			// spot.getLat()));
-			// Graphic g = new Graphic(new Point(spot.getLon() + 0.000015,
-			// spot.getLat()), textsymbol,
-			// map, new InfoTemplate(
-			// String.valueOf(spot.getID()), spot.getName()));
-			// scenicSoptsLabelLayer.setGraphicVisible(g.getUid(), false);
-			// scenicSoptsLabelLayer.addGraphic(g);
-			// }
+			Graphic g = new Graphic(new Point(spot.getLon(), spot.getLat()),
+					null, new HashMap<String, Object>(), new InfoTemplate(
+							String.valueOf(spot.getID()), spot.getName()));
+			scenicSpotsLayer.addGraphic(g);
 		}
 	}
 
@@ -505,6 +437,8 @@ public class NavigationActivity extends Activity {
 				10, locationListener);
 	}
 
+	private int currentLocationPointID = -1;
+
 	/**
 	 * 显示当前位置
 	 * 
@@ -513,10 +447,14 @@ public class NavigationActivity extends Activity {
 	private void showCurrentLocation(Location location) {
 		Symbol symbol = new SimpleMarkerSymbol(Color.BLACK, 10,
 				SimpleMarkerSymbol.STYLE.CIRCLE);
-		currentLocationPoint = new Graphic(new Point(location.getLongitude(),
-				location.getLatitude()), symbol);
-		if (currentLocationLayer.getNumberOfGraphics() == 0) {
-			currentLocationLayer.addGraphic(currentLocationPoint);
+		if (currentLocationPoint == null) {
+			currentLocationPoint = new Graphic(new Point(
+					location.getLongitude(), location.getLatitude()), symbol);
+			currentLocationPointID = currentLocationLayer
+					.addGraphic(currentLocationPoint);
+		} else {
+			currentLocationLayer.updateGraphic(currentLocationPointID,
+					new Point(location.getLongitude(), location.getLatitude()));
 		}
 	}
 
