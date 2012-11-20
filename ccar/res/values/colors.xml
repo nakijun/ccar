@@ -3,5 +3,6 @@
     <color name="red">#FF0000</color>
     <color name="black">#000000</color>
     <color name="maptitle_background">#99eeeeee</color>
+    <color name="scalebar_background">#7F2F2F2F</color>
     
 </resources>

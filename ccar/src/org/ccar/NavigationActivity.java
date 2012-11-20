@@ -21,7 +21,6 @@ import com.esri.core.symbol.PictureMarkerSymbol;
 import com.esri.core.symbol.SimpleLineSymbol;
 import com.esri.core.symbol.SimpleMarkerSymbol;
 import com.esri.core.symbol.Symbol;
-import com.esri.core.symbol.TextSymbol;
 
 import android.app.Activity;
 import android.content.Context;
@@ -63,11 +62,6 @@ public class NavigationActivity extends Activity {
 	private GraphicsLayer scenicSpotsLayer;
 
 	/**
-	 * 景点文字标注图层
-	 */
-	private GraphicsLayer scenicSoptsLabelLayer;
-
-	/**
 	 * 路径图层。
 	 */
 	private GraphicsLayer routeLayer;
@@ -87,11 +81,6 @@ public class NavigationActivity extends Activity {
 	 */
 	private Graphic selectedScenicSpot;
 
-	/**
-	 * 指示是否正在进行导航。
-	 */
-	private boolean isNavigating;
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -109,11 +98,6 @@ public class NavigationActivity extends Activity {
 		imgbtnAR = (ImageButton) findViewById(R.id.ar_imgbutton);
 
 		setControlProperty(); // 设置控件属性
-
-		// showScenicSpot(); // 显示景点
-		// setLabelVisible(); // 默认设置Label不可见
-		// receiveCurrentLocation();// 获取并显示当前位置
-
 	}
 
 	@Override
@@ -180,10 +164,6 @@ public class NavigationActivity extends Activity {
 		// 添加景点图层。
 		scenicSpotsLayer = new GraphicsLayer();
 		mapView.addLayer(scenicSpotsLayer);
-
-		// 添加景点文字标注图层
-		scenicSoptsLabelLayer = new GraphicsLayer();
-		mapView.addLayer(scenicSoptsLabelLayer);
 
 		// 添加路径图层。
 		routeLayer = new GraphicsLayer();
@@ -264,36 +244,6 @@ public class NavigationActivity extends Activity {
 				return;
 			}
 
-			//
-			if (isNavigating) {
-				routeLayer.removeAll();
-
-				RouteTask routeTask = new RouteTask(
-						"http://218.108.83.172/ArcGIS/rest/services/pathline/NAServer/Route",
-						mapView.toMapPoint(x, y), (Point) selectedScenicSpot
-								.getGeometry());
-				int errorCode = routeTask.Solve();
-				if (errorCode > 0) {
-					Toast.makeText(NavigationActivity.this, errorCode,
-							Toast.LENGTH_SHORT);
-				} else {
-					Graphic route = new Graphic(routeTask.getResult(),
-							routeSymbol);
-					routeLayer.addGraphic(route);
-					Graphic startMarker = new Graphic(mapView.toMapPoint(x, y),
-							startMarkerSymbol);
-					routeLayer.addGraphic(startMarker);
-					Graphic endMarker = new Graphic(
-							(Point) selectedScenicSpot.getGeometry(),
-							endMarkerSymbol);
-					routeLayer.addGraphic(endMarker);
-				}
-
-				selectedScenicSpot = null;
-				isNavigating = false;
-				return;
-			}
-
 			int[] uids = scenicSpotsLayer.getGraphicIDs(x, y, 10);
 			if (uids != null && uids.length > 0) {
 				Graphic g = scenicSpotsLayer.getGraphic(uids[0]);
@@ -311,16 +261,6 @@ public class NavigationActivity extends Activity {
 			}
 		}
 	};
-
-	// private final OnZoomListener m_onZoomListener = new OnZoomListener() {
-	// @Override
-	// public void preAction(float pivotX, float pivotY, double factor) {
-	// }
-	// @Override
-	// public void postAction(float pivotX, float pivotY, double factor) {
-	// setLabelVisible();
-	// }
-	// };
 
 	/**
 	 * 加载Callout
@@ -347,8 +287,7 @@ public class NavigationActivity extends Activity {
 						SpotInfoActivity.class);
 				i.putExtra("spot_id", (String) view.getTag());
 				startActivity(i);
-				// Toast.makeText(NavigationActivity.this, tvSpotname.getText(),
-				// Toast.LENGTH_SHORT).show();
+
 			}
 		});
 
@@ -405,7 +344,9 @@ public class NavigationActivity extends Activity {
 		List<ScenicSpot> spotList = dm.getScenicSpots();
 		for (ScenicSpot spot : spotList) {
 			Graphic g = new Graphic(new Point(spot.getLon(), spot.getLat()),
-					null, new HashMap<String, Object>(), new InfoTemplate(
+					new SimpleMarkerSymbol(Color.argb(1, 255, 255, 255), 16,
+							SimpleMarkerSymbol.STYLE.CIRCLE),
+					new HashMap<String, Object>(), new InfoTemplate(
 							String.valueOf(spot.getID()), spot.getName()));
 			scenicSpotsLayer.addGraphic(g);
 		}
@@ -480,17 +421,4 @@ public class NavigationActivity extends Activity {
 			showCurrentLocation(location);
 		}
 	};
-
-	private void setLabelVisible() {
-		if (mapView.getScale() < 5000) {
-			for (int gid : scenicSoptsLabelLayer.getGraphicIDs()) {
-				scenicSoptsLabelLayer.setGraphicVisible(gid, true);
-			}
-		} else {
-			for (int gid : scenicSoptsLabelLayer.getGraphicIDs()) {
-				scenicSoptsLabelLayer.setGraphicVisible(gid, false);
-			}
-		}
-
-	}
 }

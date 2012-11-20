@@ -18,4 +18,5 @@
     <string name="json_related_error">数据格式不正确！</string>
     <string name="nav">导航</string>
     <string name="clear_results">清除结果</string>
+    <string name="range">范围</string>
 </resources>
