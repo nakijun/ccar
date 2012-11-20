@@ -1,6 +1,9 @@
 package org.ccar.ar;
 
 import java.text.DecimalFormat;
+import java.util.zip.Inflater;
+
+import org.ccar.R;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -11,6 +14,7 @@ import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
@@ -19,24 +23,17 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
-import android.widget.TextView;
 
 public class AugmentedActivity extends SensorsActivity implements
 		OnTouchListener {
 	private static final String TAG = "AugmentedActivity";
 	private static final DecimalFormat FORMAT = new DecimalFormat("#.##");
-	private static final int ZOOMBAR_BACKGROUND_COLOR = Color.argb(125, 55, 55,
-			55);
-	private static final String END_TEXT = FORMAT
-			.format(AugmentedActivity.MAX_ZOOM) + " km";
-	private static final int END_TEXT_COLOR = Color.WHITE;
 
 	protected static WakeLock wakeLock = null;
 	protected static CameraSurface camScreen = null;
-	protected static VerticalSeekBar myZoomBar = null;
-	protected static TextView endLabel = null;
-	protected static LinearLayout zoomLayout = null;
+	protected static SeekBar myZoomBar = null;
 	protected static AugmentedView augmentedView = null;
+	protected static LinearLayout zoomLayout = null;
 
 	public static final float MAX_ZOOM = 100; // in KM
 	public static final float ONE_PERCENT = MAX_ZOOM / 100f;
@@ -61,32 +58,17 @@ public class AugmentedActivity extends SensorsActivity implements
 				LayoutParams.WRAP_CONTENT);
 		addContentView(augmentedView, augLayout);
 
-		zoomLayout = new LinearLayout(this);
+		LayoutInflater inflater = getLayoutInflater();
+		zoomLayout = (LinearLayout) inflater.inflate(R.layout.scalebar, null);
 		zoomLayout.setVisibility((showZoomBar) ? LinearLayout.VISIBLE
 				: LinearLayout.GONE);
-		zoomLayout.setOrientation(LinearLayout.VERTICAL);
-		zoomLayout.setPadding(5, 5, 5, 5);
-		zoomLayout.setBackgroundColor(ZOOMBAR_BACKGROUND_COLOR);
 
-		endLabel = new TextView(this);
-		endLabel.setText(END_TEXT);
-		endLabel.setTextColor(END_TEXT_COLOR);
-		LinearLayout.LayoutParams zoomTextParams = new LinearLayout.LayoutParams(
-				LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-		zoomLayout.addView(endLabel, zoomTextParams);
-
-		myZoomBar = new VerticalSeekBar(this);
-		myZoomBar.setMax(100);
-		myZoomBar.setProgress(50);
+		myZoomBar = (SeekBar) zoomLayout.findViewById(R.id.scalebar);
 		myZoomBar.setOnSeekBarChangeListener(myZoomBarOnSeekBarChangeListener);
-		LinearLayout.LayoutParams zoomBarParams = new LinearLayout.LayoutParams(
-				LayoutParams.WRAP_CONTENT, LayoutParams.FILL_PARENT);
-		zoomBarParams.gravity = Gravity.CENTER_HORIZONTAL;
-		zoomLayout.addView(myZoomBar, zoomBarParams);
 
 		FrameLayout.LayoutParams frameLayoutParams = new FrameLayout.LayoutParams(
-				LayoutParams.WRAP_CONTENT, LayoutParams.FILL_PARENT,
-				Gravity.RIGHT);
+				LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT,
+				Gravity.TOP);
 		addContentView(zoomLayout, frameLayoutParams);
 
 		updateDataOnZoom();
