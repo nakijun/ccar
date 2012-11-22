@@ -12,7 +12,7 @@ public class PaintableRadarPoints extends PaintableObject {
 		if (canvas == null)
 			throw new NullPointerException();
 
-		float range = ARData.getRadius() * 1000;
+		float range = ARData.getRadius();
 		float scale = range / Radar.RADIUS;
 		for (Marker pm : ARData.getMarkers()) {
 			pm.getLocation().get(locationArray);

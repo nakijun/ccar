@@ -2,15 +2,11 @@
 
     <item
         android:id="@+id/showRadar"
-        android:title="Hide Radar">
+        android:title="隐藏雷达图">
     </item>
     <item
         android:id="@+id/showZoomBar"
-        android:title="Hide Zoom Bar">
-    </item>
-    <item
-        android:id="@+id/exit"
-        android:title="Exit">
+        android:title="隐藏缩放栏">
     </item>
 
 </menu>
