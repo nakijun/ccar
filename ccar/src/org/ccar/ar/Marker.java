@@ -163,7 +163,7 @@ public class Marker implements Comparable<Marker> {
 	private synchronized void updateRadar() {
 		isOnRadar = false;
 
-		float range = ARData.getRadius() * 1000;
+		float range = ARData.getRadius();
 		float scale = range / Radar.RADIUS;
 		locationXyzRelativeToPhysicalLocation.get(locationArray);
 		float x = locationArray[0] / scale;

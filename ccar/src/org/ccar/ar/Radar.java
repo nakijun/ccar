@@ -4,12 +4,13 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 
 public class Radar {
-	public static final float RADIUS = 48;
+	public static final float RADIUS = 60;
 
-	private static final int LINE_COLOR = Color.argb(150, 0, 0, 220);
+	private static final int LINE_COLOR = Color.argb(100, 255, 255, 255);
 	private static final float PAD_X = 10;
-	private static final float PAD_Y = 80;
-	private static final int RADAR_COLOR = Color.argb(100, 0, 0, 200);
+	private static final float PAD_Y = 90;
+	private static final int RING_COLOR = Color.argb(200, 255, 255, 255);
+	private static final int RADAR_COLOR = Color.argb(100, 100, 100, 100);
 	private static final int TEXT_COLOR = Color.rgb(255, 255, 255);
 	private static final int TEXT_SIZE = 12;
 
@@ -18,6 +19,7 @@ public class Radar {
 	private static PaintablePosition leftLineContainer = null;
 	private static PaintablePosition rightLineContainer = null;
 	private static PaintablePosition circleContainer = null;
+	private static PaintablePosition ringContainer = null;
 
 	private static PaintableRadarPoints radarPoints = null;
 	private static PaintablePosition pointsContainer = null;
@@ -50,6 +52,15 @@ public class Radar {
 		if (canvas == null)
 			throw new NullPointerException();
 
+		if (ringContainer == null) {
+			PaintableCircle paintableRing = new PaintableCircle(RING_COLOR,
+					RADIUS, false);
+			paintableRing.setStrokeWidth(3);
+			ringContainer = new PaintablePosition(paintableRing, PAD_X
+					+ RADIUS, PAD_Y + RADIUS, 0, 1);
+		}
+		ringContainer.paint(canvas);
+		
 		if (circleContainer == null) {
 			PaintableCircle paintableCircle = new PaintableCircle(RADAR_COLOR,
 					RADIUS, true);
@@ -88,6 +99,7 @@ public class Radar {
 			float leftX = leftRadarLine.getX() - (PAD_X + RADIUS);
 			float leftY = leftRadarLine.getY() - (PAD_Y + RADIUS);
 			PaintableLine leftLine = new PaintableLine(LINE_COLOR, leftX, leftY);
+			leftLine.setStrokeWidth(2);
 			leftLineContainer = new PaintablePosition(leftLine, PAD_X + RADIUS,
 					PAD_Y + RADIUS, 0, 1);
 		}
@@ -102,6 +114,7 @@ public class Radar {
 			float rightY = rightRadarLine.getY() - (PAD_Y + RADIUS);
 			PaintableLine rightLine = new PaintableLine(LINE_COLOR, rightX,
 					rightY);
+			rightLine.setStrokeWidth(2);
 			rightLineContainer = new PaintablePosition(rightLine, PAD_X
 					+ RADIUS, PAD_Y + RADIUS, 0, 1);
 		}
@@ -133,8 +146,8 @@ public class Radar {
 		radarText(canvas, "" + bearing + ((char) 176) + " " + dirTxt,
 				(PAD_X + RADIUS), (PAD_Y - 5), true);
 
-		radarText(canvas, formatDist(ARData.getRadius() * 1000),
-				(PAD_X + RADIUS), (PAD_Y + RADIUS * 2 - 10), false);
+//		radarText(canvas, GeoCalcUtil.formatDistance(ARData.getRadius()),
+//				(PAD_X + RADIUS), (PAD_Y + RADIUS * 2 - 10), false);
 	}
 
 	private void radarText(Canvas canvas, String txt, float x, float y,
@@ -153,24 +166,5 @@ public class Radar {
 			paintedContainer.set(paintableText, x, y, 0, 1);
 
 		paintedContainer.paint(canvas);
-	}
-
-	private static String formatDist(float meters) {
-		if (meters < 1000) {
-			return ((int) meters) + "m";
-		} else if (meters < 10000) {
-			return formatDec(meters / 1000f, 1) + "km";
-		} else {
-			return ((int) (meters / 1000f)) + "km";
-		}
-	}
-
-	private static String formatDec(float val, int dec) {
-		int factor = (int) Math.pow(10, dec);
-
-		int front = (int) (val);
-		int back = (int) Math.abs(val * (factor)) % factor;
-
-		return front + "." + back;
 	}
 }

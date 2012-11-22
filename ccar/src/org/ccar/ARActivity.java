@@ -57,16 +57,13 @@ public class ARActivity extends AugmentedActivity {
 		switch (item.getItemId()) {
 		case R.id.showRadar:
 			showRadar = !showRadar;
-			item.setTitle(((showRadar) ? "Hide" : "Show") + " Radar");
+			item.setTitle(((showRadar) ? "Òþ²Ø" : "ÏÔÊ¾") + "À×´ïÍ¼");
 			break;
 		case R.id.showZoomBar:
 			showZoomBar = !showZoomBar;
-			item.setTitle(((showZoomBar) ? "Hide" : "Show") + " Zoom Bar");
-			zoomLayout.setVisibility((showZoomBar) ? LinearLayout.VISIBLE
+			item.setTitle(((showZoomBar) ? "Òþ²Ø" : "ÏÔÊ¾") + "Ëõ·ÅÀ¸");
+			zoomBarLayout.setVisibility((showZoomBar) ? LinearLayout.VISIBLE
 					: LinearLayout.GONE);
-			break;
-		case R.id.exit:
-			finish();
 			break;
 		}
 		return true;
@@ -100,11 +97,12 @@ public class ARActivity extends AugmentedActivity {
 			if (localData == null) {
 				return;
 			}
-			
-			double[] xy = GeoCalcUtil.WGS2flat(lon, lat);
-//			double[] xy = GeoCalcUtil.WGS2flat(lon - 1.4032279, lat - 0.76549289);
+
+			// double[] xy = GeoCalcUtil.WGS2flat(lon, lat);
+			double[] xy = GeoCalcUtil
+					.WGS2flat(lon - 0.077639, lat - 0.008553);
 			List<Marker> markers = localData.getMarkers(dm, xy[0], xy[1],
-					ARData.getRadius() * 1000);
+					ARData.getRadius());
 			ARData.addMarkers(markers);
 		} catch (RejectedExecutionException rej) {
 			Log.w(TAG, "Not running new download Runnable, queue is full.");

@@ -2,32 +2,34 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/scalebar_background"
+    android:background="@color/bg_zoombar"
     android:orientation="horizontal"
-    android:padding="5dip" >
+    android:paddingBottom="5dip"
+    android:paddingLeft="10dip"
+    android:paddingRight="10dip"
+    android:paddingTop="5dip" >
 
     <TextView
-        android:id="@+id/range"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:text="@string/range" />
 
     <SeekBar
-        android:id="@+id/scalebar"
+        android:id="@+id/sb_zoombar"
         android:layout_width="0dip"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="5dip"
-        android:layout_marginRight="5dip"
+        android:layout_marginLeft="10dip"
+        android:layout_marginRight="10dip"
         android:layout_weight="1"
-        android:max="100"
-        android:progress="50" />
+        android:max="30"
+        android:progress="4" />
 
     <TextView
-        android:id="@+id/distance"
+        android:id="@+id/tv_zoombar_range"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        android:textSize="16dip" />
+        android:minWidth="42dip" />
 
 </LinearLayout>
