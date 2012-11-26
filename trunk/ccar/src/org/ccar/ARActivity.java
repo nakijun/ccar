@@ -1,5 +1,6 @@
 package org.ccar;
 
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.concurrent.RejectedExecutionException;
 
@@ -12,6 +13,7 @@ import org.ccar.ar.LocalDataSource;
 import org.ccar.ar.Marker;
 import org.ccar.data.DatabaseManager;
 
+import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
@@ -19,8 +21,12 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup.LayoutParams;
+import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 public class ARActivity extends AugmentedActivity {
 	private static final String TAG = "MainActivity";
@@ -28,9 +34,42 @@ public class ARActivity extends AugmentedActivity {
 	private LocalDataSource localData;
 	private DatabaseManager dm;
 
+	private int currentSpotID = -1;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		ImageButton map = new ImageButton(this);
+		map.setImageDrawable(this.getResources().getDrawable(R.drawable.map));
+		map.setBackgroundColor(this.getResources()
+				.getColor(R.color.transparent));
+		map.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View view) {
+				Intent intent = new Intent(ARActivity.this,
+						NavigationActivity.class);
+				startActivity(intent);
+			}
+		});
+		FrameLayout.LayoutParams frameLayoutParams = new FrameLayout.LayoutParams(
+				LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT,
+				Gravity.RIGHT);
+		frameLayoutParams.setMargins(0, 60, 0, 0);
+		addContentView(map, frameLayoutParams);
+
+		go.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View view) {
+				Intent i = new Intent(ARActivity.this, SpotInfoActivity.class);
+				i.putExtra("spot_id", String.valueOf(currentSpotID));
+				startActivity(i);
+
+			}
+		});
+
 		localData = new LocalDataSource(this.getResources());
 		CCARApplication ccarApplication = (CCARApplication) getApplication();
 		dm = ccarApplication.getDatabaseManager();
@@ -79,10 +118,25 @@ public class ARActivity extends AugmentedActivity {
 
 	@Override
 	protected void markerTouched(Marker marker) {
-		Toast t = Toast.makeText(getApplicationContext(), marker.getName(),
-				Toast.LENGTH_SHORT);
-		t.setGravity(Gravity.CENTER, 0, 0);
-		t.show();
+		if (marker.getCode().equalsIgnoreCase("JD")) {
+			StringBuilder title = new StringBuilder(marker.getName());
+			title.append(" (");
+			double distance = marker.getDistance();
+			if (distance < 1000) {
+				title.append((int) distance);
+				title.append("รื");
+			} else {
+				DecimalFormat format = new DecimalFormat("#.#");
+				title.append(format.format(distance / 1000));
+				title.append("วงรื");
+			}
+			title.append(")");
+			titleValue.setText(title.toString());
+			infoValue.setText(marker.getInfo());
+			markerInfoLayout.setVisibility(LinearLayout.VISIBLE);
+
+			currentSpotID = marker.getID();
+		}
 	}
 
 	@Override
@@ -99,8 +153,7 @@ public class ARActivity extends AugmentedActivity {
 			}
 
 			// double[] xy = GeoCalcUtil.WGS2flat(lon, lat);
-			double[] xy = GeoCalcUtil
-					.WGS2flat(lon - 0.077639, lat - 0.008553);
+			double[] xy = GeoCalcUtil.WGS2flat(lon - 0.077639, lat - 0.008553);
 			List<Marker> markers = localData.getMarkers(dm, xy[0], xy[1],
 					ARData.getRadius());
 			ARData.addMarkers(markers);

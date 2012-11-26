@@ -19,4 +19,6 @@
     <string name="nav">导航</string>
     <string name="clear_results">清除结果</string>
     <string name="range">范围</string>
+    <string name="go">跳转</string>
+    <string name="close">×</string>
 </resources>

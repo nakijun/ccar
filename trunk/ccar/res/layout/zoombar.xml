@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/bg_zoombar"
+    android:background="@color/bg_ar"
     android:orientation="horizontal"
     android:paddingBottom="5dip"
     android:paddingLeft="10dip"
@@ -13,13 +13,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        android:text="@string/range" />
+        android:layout_marginRight="10dip"
+        android:text="@string/range"
+        android:textColor="@color/white" />
 
     <SeekBar
         android:id="@+id/sb_zoombar"
         android:layout_width="0dip"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10dip"
         android:layout_marginRight="10dip"
         android:layout_weight="1"
         android:max="30"
@@ -30,6 +31,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        android:minWidth="42dip" />
+        android:minWidth="42dip"
+        android:textColor="@color/white" />
 
 </LinearLayout>

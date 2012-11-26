@@ -13,9 +13,12 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
@@ -32,21 +35,30 @@ public class AugmentedActivity extends SensorsActivity implements
 	public static boolean useCollisionDetection = false;
 	public static boolean showRadar = true;
 	public static boolean showZoomBar = true;
+	public static boolean showMarkerInfo = false;
 
 	/**
 	 * 缩放栏布局。
 	 */
-	protected static LinearLayout zoomBarLayout;
+	protected static LinearLayout zoomBarLayout = null;
 
 	/**
 	 * 缩放栏。
 	 */
-	protected static SeekBar zoomBar;
+	protected static SeekBar zoomBar = null;
 
 	/**
 	 * 范围值。
 	 */
-	protected static TextView rangeValue;
+	protected static TextView rangeValue = null;
+
+	protected static LinearLayout markerInfoLayout = null;
+
+	protected static TextView titleValue = null;
+
+	protected static TextView infoValue = null;
+
+	protected static ImageButton go = null;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -62,6 +74,7 @@ public class AugmentedActivity extends SensorsActivity implements
 		addContentView(augmentedView, augLayout);
 
 		LayoutInflater layoutInflater = getLayoutInflater();
+
 		zoomBarLayout = (LinearLayout) layoutInflater.inflate(R.layout.zoombar,
 				null);
 		zoomBarLayout.setVisibility((showZoomBar) ? LinearLayout.VISIBLE
@@ -74,6 +87,29 @@ public class AugmentedActivity extends SensorsActivity implements
 				LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT,
 				Gravity.TOP);
 		addContentView(zoomBarLayout, frameLayoutParams);
+
+		markerInfoLayout = (LinearLayout) layoutInflater.inflate(
+				R.layout.markerinfo, null);
+		markerInfoLayout.setVisibility((showMarkerInfo) ? LinearLayout.VISIBLE
+				: LinearLayout.GONE);
+		titleValue = (TextView) markerInfoLayout
+				.findViewById(R.id.tv_markerinfo_title);
+		infoValue = (TextView) markerInfoLayout
+				.findViewById(R.id.tv_markerinfo_info);
+		go = (ImageButton) markerInfoLayout.findViewById(R.id.ib_markerinfo_go);
+		Button close = (Button) markerInfoLayout
+				.findViewById(R.id.btn_markerinfo_close);
+		close.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				markerInfoLayout.setVisibility(LinearLayout.GONE);
+			}
+		});
+		frameLayoutParams = new FrameLayout.LayoutParams(
+				LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT,
+				Gravity.BOTTOM);
+		addContentView(markerInfoLayout, frameLayoutParams);
 
 		updateDataOnZoom();
 

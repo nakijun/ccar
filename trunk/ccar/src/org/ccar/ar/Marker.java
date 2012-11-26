@@ -1,15 +1,11 @@
 package org.ccar.ar;
 
-import java.text.DecimalFormat;
-
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.location.Location;
 import android.util.Log;
 
 public class Marker implements Comparable<Marker> {
-	private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("@#");
-
 	private static final Vector symbolVector = new Vector(0, 0, 0);
 	private static final Vector textVector = new Vector(0, 1, 0);
 
@@ -33,7 +29,10 @@ public class Marker implements Comparable<Marker> {
 
 	protected volatile PaintableObject gpsSymbol = null;
 	protected volatile PaintablePosition symbolContainer = null;
+	protected int id = -1;
 	protected String name = null;
+	protected String info = null;
+	protected String code = null;
 	protected volatile PhysicalLocationUtility physicalLocation = new PhysicalLocationUtility();
 	protected volatile double distance = 0.0;
 	protected volatile boolean isOnRadar = false;
@@ -51,17 +50,20 @@ public class Marker implements Comparable<Marker> {
 	private static PaintableBox collisionBox = null;
 	private static PaintablePosition collisionPosition = null;
 
-	public Marker(String name, double latitude, double longitude,
-			double altitude, int color) {
-		set(name, latitude, longitude, altitude, color);
+	public Marker(int id, String name, String info, String code, double latitude,
+			double longitude, double altitude, int color) {
+		set(id, name, info, code, latitude, longitude, altitude, color);
 	}
 
-	public synchronized void set(String name, double latitude,
-			double longitude, double altitude, int color) {
+	public synchronized void set(int id, String name, String info, String code,
+			double latitude, double longitude, double altitude, int color) {
 		if (name == null)
 			throw new NullPointerException();
 
+		this.id = id;
 		this.name = name;
+		this.info = info;
+		this.code = code;
 		this.physicalLocation.set(latitude, longitude, altitude);
 		this.color = color;
 		this.isOnRadar = false;
@@ -71,9 +73,21 @@ public class Marker implements Comparable<Marker> {
 		this.locationXyzRelativeToPhysicalLocation.set(0, 0, 0);
 		this.initialY = 0.0f;
 	}
+	
+	public synchronized int getID() {
+		return this.id;
+	}
 
 	public synchronized String getName() {
 		return this.name;
+	}
+
+	public synchronized String getInfo() {
+		return this.info;
+	}
+
+	public synchronized String getCode() {
+		return this.code;
 	}
 
 	public synchronized int getColor() {
@@ -411,23 +425,23 @@ public class Marker implements Comparable<Marker> {
 		if (canvas == null)
 			throw new NullPointerException();
 
-		String textStr = null;
-		if (distance < 1000.0) {
-			textStr = name + " (" + DECIMAL_FORMAT.format(distance) + "m)";
-		} else {
-			double d = distance / 1000.0;
-			textStr = name + " (" + DECIMAL_FORMAT.format(d) + "km)";
-		}
+		// String textStr = null;
+		// if (distance < 1000.0) {
+		// textStr = name + " (" + DECIMAL_FORMAT.format(distance) + "m)";
+		// } else {
+		// double d = distance / 1000.0;
+		// textStr = name + " (" + DECIMAL_FORMAT.format(d) + "km)";
+		// }
 
 		textXyzRelativeToCameraView.get(textArray);
 		symbolXyzRelativeToCameraView.get(symbolArray);
 
 		float maxHeight = Math.round(canvas.getHeight() / 10f) + 1;
 		if (textBox == null)
-			textBox = new PaintableBoxedText(textStr,
+			textBox = new PaintableBoxedText(name,
 					Math.round(maxHeight / 2f) + 1, 300);
 		else
-			textBox.set(textStr, Math.round(maxHeight / 2f) + 1, 300);
+			textBox.set(name, Math.round(maxHeight / 2f) + 1, 300);
 
 		float currentAngle = Utilities.getAngle(symbolArray[0], symbolArray[1],
 				textArray[0], textArray[1]);
