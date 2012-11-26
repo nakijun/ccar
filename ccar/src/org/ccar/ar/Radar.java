@@ -92,7 +92,7 @@ public class Radar {
 			throw new NullPointerException();
 
 		if (leftLineContainer == null) {
-			leftRadarLine.set(0, -RADIUS);
+			leftRadarLine.set(0, -RADIUS + 10);
 			leftRadarLine.rotate(-CameraModel.DEFAULT_VIEW_ANGLE / 2);
 			leftRadarLine.add(PAD_X + RADIUS, PAD_Y + RADIUS);
 
@@ -106,7 +106,7 @@ public class Radar {
 		leftLineContainer.paint(canvas);
 
 		if (rightLineContainer == null) {
-			rightRadarLine.set(0, -RADIUS);
+			rightRadarLine.set(0, -RADIUS + 10);
 			rightRadarLine.rotate(CameraModel.DEFAULT_VIEW_ANGLE / 2);
 			rightRadarLine.add(PAD_X + RADIUS, PAD_Y + RADIUS);
 

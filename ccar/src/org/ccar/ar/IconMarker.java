@@ -6,8 +6,8 @@ import android.graphics.Canvas;
 public class IconMarker extends Marker {
     private Bitmap bitmap = null;
 
-    public IconMarker(String name, double latitude, double longitude, double altitude, int color, Bitmap bitmap) {
-        super(name, latitude, longitude, altitude, color);
+    public IconMarker(int id, String name, String info, String code, double latitude, double longitude, double altitude, int color, Bitmap bitmap) {
+        super(id, name, info, code, latitude, longitude, altitude, color);
         this.bitmap = bitmap;
     }
 

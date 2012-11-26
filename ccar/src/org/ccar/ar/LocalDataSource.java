@@ -44,11 +44,12 @@ public class LocalDataSource extends DataSource {
 	}
 
 	public List<Marker> getMarkers() {
-		Marker atl = new IconMarker("ATL", 39.931269, -75.051261, 0,
+		Marker atl = new IconMarker(1, "ATL", "", "", 39.931269, -75.051261, 0,
 				Color.DKGRAY, icon);
 		cachedMarkers.add(atl);
 
-		Marker home = new Marker("Mt Laurel", 39.95, -74.9, 0, Color.YELLOW);
+		Marker home = new Marker(2, "Mt Laurel", "", "", 39.95, -74.9, 0,
+				Color.YELLOW);
 		cachedMarkers.add(home);
 
 		return cachedMarkers;
@@ -57,14 +58,20 @@ public class LocalDataSource extends DataSource {
 	public List<Marker> getMarkers(DatabaseManager dm, double x, double y,
 			double radius) {
 		cachedMarkers.clear();
-		List<ScenicSpot> scenicSpots = dm.getScenicSpots(String.valueOf(x), String.valueOf(y), radius);
+		List<ScenicSpot> scenicSpots = dm.getScenicSpots(String.valueOf(x),
+				String.valueOf(y), radius);
 		for (ScenicSpot scenicSpot : scenicSpots) {
 			Bitmap bitmap = icons.get(scenicSpot.getCode());
 			if (bitmap == null) {
 				continue;
 			}
-//			Marker marker = new IconMarker(scenicSpot.getName(), scenicSpot.getLat(), scenicSpot.getLon(), 0, Color.WHITE, bitmap);
-			Marker marker = new IconMarker(scenicSpot.getName(), scenicSpot.getLat() + 0.008553, scenicSpot.getLon() + 0.077639, 0, Color.YELLOW, bitmap);
+			// Marker marker = new IconMarker(scenicSpot.getName(),
+			// scenicSpot.getLat(), scenicSpot.getLon(), 0, Color.WHITE,
+			// bitmap);
+			Marker marker = new IconMarker(scenicSpot.getID(),
+					scenicSpot.getName(), scenicSpot.getDescription(),
+					scenicSpot.getCode(), scenicSpot.getLat() + 0.008553,
+					scenicSpot.getLon() + 0.077639, 0, Color.YELLOW, bitmap);
 			cachedMarkers.add(marker);
 		}
 		return cachedMarkers;
