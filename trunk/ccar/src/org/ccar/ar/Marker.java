@@ -436,7 +436,7 @@ public class Marker implements Comparable<Marker> {
 		textXyzRelativeToCameraView.get(textArray);
 		symbolXyzRelativeToCameraView.get(symbolArray);
 
-		float maxHeight = Math.round(canvas.getHeight() / 10f) + 1;
+		float maxHeight = Math.round(canvas.getHeight() / 12f) + 1;
 		if (textBox == null)
 			textBox = new PaintableBoxedText(name,
 					Math.round(maxHeight / 2f) + 1, 300);
