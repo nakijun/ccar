@@ -15,7 +15,7 @@ public class IconMarker extends Marker {
     public void drawIcon(Canvas canvas) {
     	if (canvas==null || bitmap==null) throw new NullPointerException();
 
-        if (gpsSymbol==null) gpsSymbol = new PaintableIcon(bitmap,96,96);
+        if (gpsSymbol==null) gpsSymbol = new PaintableIcon(bitmap,64,74);
 
         textXyzRelativeToCameraView.get(textArray);
         symbolXyzRelativeToCameraView.get(symbolArray);
