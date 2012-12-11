@@ -65,13 +65,14 @@ public class LocalDataSource extends DataSource {
 			if (bitmap == null) {
 				continue;
 			}
-			// Marker marker = new IconMarker(scenicSpot.getName(),
-			// scenicSpot.getLat(), scenicSpot.getLon(), 0, Color.WHITE,
-			// bitmap);
 			Marker marker = new IconMarker(scenicSpot.getID(),
 					scenicSpot.getName(), scenicSpot.getDescription(),
-					scenicSpot.getCode(), scenicSpot.getLat() + 0.008553,
-					scenicSpot.getLon() + 0.077639, 0, Color.YELLOW, bitmap);
+					scenicSpot.getCode(), scenicSpot.getLat(),
+					scenicSpot.getLon(), 0, Color.YELLOW, bitmap);
+//			Marker marker = new IconMarker(scenicSpot.getID(),
+//					scenicSpot.getName(), scenicSpot.getDescription(),
+//					scenicSpot.getCode(), scenicSpot.getLat() + 0.008553,
+//					scenicSpot.getLon() + 0.077639, 0, Color.YELLOW, bitmap);
 			cachedMarkers.add(marker);
 		}
 		return cachedMarkers;
