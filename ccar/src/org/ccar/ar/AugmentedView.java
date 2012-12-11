@@ -17,7 +17,7 @@ public class AugmentedView extends View {
 	private static final float[] locationArray = new float[3];
 	private static final List<Marker> cache = new ArrayList<Marker>();
 	private static final TreeSet<Marker> updated = new TreeSet<Marker>();
-	private static final int COLLISION_ADJUSTMENT = 100;
+	private static final int COLLISION_ADJUSTMENT = 10;
 
 	public AugmentedView(Context context) {
 		super(context);
@@ -57,28 +57,52 @@ public class AugmentedView extends View {
 	private static void adjustForCollisions(Canvas canvas,
 			List<Marker> collection) {
 		updated.clear();
+
 		for (Marker marker1 : collection) {
-			if (updated.contains(marker1) || !marker1.isInView())
+			if (!marker1.isInView())
 				continue;
 
-			int collisions = 1;
-			for (Marker marker2 : collection) {
-				if (marker1.equals(marker2) || updated.contains(marker2)
-						|| !marker2.isInView())
-					continue;
-
-				if (marker1.isMarkerOnMarker(marker2)) {
-					marker2.getLocation().get(locationArray);
-					float y = locationArray[1];
-					float h = collisions * COLLISION_ADJUSTMENT;
-					locationArray[1] = y + h;
-					marker2.getLocation().set(locationArray);
-					marker2.update(canvas, 0, 0);
-					collisions++;
-					updated.add(marker2);
+			if (!marker1.isUpdated()) {
+				for (Marker marker2 : updated.descendingSet()) {
+					if (marker1.isMarkerOnMarker(marker2)) {
+						marker1.getLocation().get(locationArray);
+						float y = locationArray[1];
+						float h = COLLISION_ADJUSTMENT;
+						locationArray[1] = y + h;
+						marker1.getLocation().set(locationArray);
+						marker1.update(canvas, 0, 0);
+						marker1.setAlpha(100);
+						marker1.updateStatus();
+						break;
+					}
 				}
 			}
+
 			updated.add(marker1);
 		}
+		
+		// for (Marker marker1 : collection) {
+		// if (updated.contains(marker1) || !marker1.isInView())
+		// continue;
+		//
+		// int collisions = 1;
+		// for (Marker marker2 : collection) {
+		// if (marker1.equals(marker2) || updated.contains(marker2)
+		// || !marker2.isInView())
+		// continue;
+		//
+		// if (marker1.isMarkerOnMarker(marker2)) {
+		// marker2.getLocation().get(locationArray);
+		// float y = locationArray[1];
+		// float h = collisions * COLLISION_ADJUSTMENT;
+		// locationArray[1] = y + h;
+		// marker2.getLocation().set(locationArray);
+		// marker2.update(canvas, 0, 0);
+		// collisions++;
+		// updated.add(marker2);
+		// }
+		// }
+		// updated.add(marker1);
+		// }
 	}
 }

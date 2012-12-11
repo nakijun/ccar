@@ -32,7 +32,7 @@ public class AugmentedActivity extends SensorsActivity implements
 	protected static CameraSurface camScreen = null;
 	protected static AugmentedView augmentedView = null;
 
-	public static boolean useCollisionDetection = false;
+	public static boolean useCollisionDetection = true;
 	public static boolean showRadar = true;
 	public static boolean showZoomBar = true;
 	public static boolean showMarkerInfo = false;

@@ -43,6 +43,14 @@ public class PaintableBoxedText extends PaintableObject {
 
 		set(txtInit, fontSizeInit, maxWidth);
 	}
+	
+	@Override
+	public void setAlpha(int a) {
+		this.borderColor = Color.argb(a, 255, 255, 255);
+		this.backgroundColor = Color.argb(a, 0, 0, 0);
+		this.textColor = Color.argb(a, 255, 255, 255);
+//		super.setAlpha(a);
+	}
 
 	public void set(String txtInit, float fontSizeInit, float maxWidth) {
 		if (txtInit == null)
