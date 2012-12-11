@@ -37,10 +37,12 @@ public class Marker implements Comparable<Marker> {
 	protected volatile double distance = 0.0;
 	protected volatile boolean isOnRadar = false;
 	protected volatile boolean isInView = false;
+	protected volatile boolean isUpdated = false;
 	protected final Vector symbolXyzRelativeToCameraView = new Vector();
 	protected final Vector textXyzRelativeToCameraView = new Vector();
 	protected final Vector locationXyzRelativeToPhysicalLocation = new Vector();
 	protected int color = Color.WHITE;
+	protected int alpha = 255;
 
 	private static boolean debugTouchZone = false;
 	private static PaintableBox touchBox = null;
@@ -72,6 +74,10 @@ public class Marker implements Comparable<Marker> {
 		this.textXyzRelativeToCameraView.set(0, 0, 0);
 		this.locationXyzRelativeToPhysicalLocation.set(0, 0, 0);
 		this.initialY = 0.0f;
+	}
+	
+	public synchronized void setAlpha(int a) {
+		this.alpha = a;
 	}
 	
 	public synchronized int getID() {
@@ -108,6 +114,10 @@ public class Marker implements Comparable<Marker> {
 
 	public synchronized boolean isInView() {
 		return this.isInView;
+	}
+
+	public synchronized boolean isUpdated() {
+		return this.isUpdated;
 	}
 
 	public synchronized Vector getScreenPosition() {
@@ -201,6 +211,10 @@ public class Marker implements Comparable<Marker> {
 				&& y2 <= (cam.getHeight())) {
 			isInView = true;
 		}
+	}
+	
+	public synchronized void updateStatus() {
+		isUpdated = true;
 	}
 
 	public synchronized void calcRelativePosition(Location location) {
@@ -401,8 +415,10 @@ public class Marker implements Comparable<Marker> {
 		if (canvas == null)
 			throw new NullPointerException();
 
-		if (gpsSymbol == null)
+		if (gpsSymbol == null) {
 			gpsSymbol = new PaintableGps(36, 36, true, getColor());
+			gpsSymbol.setAlpha(this.alpha);
+		}
 
 		textXyzRelativeToCameraView.get(textArray);
 		symbolXyzRelativeToCameraView.get(symbolArray);
@@ -437,11 +453,14 @@ public class Marker implements Comparable<Marker> {
 		symbolXyzRelativeToCameraView.get(symbolArray);
 
 		float maxHeight = Math.round(canvas.getHeight() / 12f) + 1;
-		if (textBox == null)
+		if (textBox == null) {
 			textBox = new PaintableBoxedText(name,
 					Math.round(maxHeight / 2f) + 1, 300);
-		else
+		}
+		else {
 			textBox.set(name, Math.round(maxHeight / 2f) + 1, 300);
+		}
+		textBox.setAlpha(this.alpha);
 
 		float currentAngle = Utilities.getAngle(symbolArray[0], symbolArray[1],
 				textArray[0], textArray[1]);

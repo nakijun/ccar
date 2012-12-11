@@ -9,11 +9,11 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 
 public abstract class PaintableObject {
-	private Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+	private Paint paint = null;
 
 	public PaintableObject() {
 		if (paint == null) {
-			paint = new Paint();
+			paint = new Paint(Paint.ANTI_ALIAS_FLAG);
 			paint.setTextSize(16);
 			paint.setAntiAlias(true);
 			paint.setColor(Color.BLUE);
@@ -40,6 +40,10 @@ public abstract class PaintableObject {
 
 	public void setStrokeWidth(float w) {
 		paint.setStrokeWidth(w);
+	}
+
+	public void setAlpha(int a) {
+		paint.setAlpha(a);
 	}
 
 	public float getTextWidth(String txt) {

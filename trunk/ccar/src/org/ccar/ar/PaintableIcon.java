@@ -19,7 +19,7 @@ public class PaintableIcon extends PaintableObject {
 	@Override
     public void paint(Canvas canvas) {
     	if (canvas==null || bitmap==null) throw new NullPointerException();
-
+    	
         paintBitmap(canvas, bitmap, -(bitmap.getWidth()/2), -(bitmap.getHeight()/2));
     }
 

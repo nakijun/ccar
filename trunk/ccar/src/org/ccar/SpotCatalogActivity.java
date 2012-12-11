@@ -2,7 +2,6 @@ package org.ccar;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import org.ccar.app.CCARApplication;
 import org.ccar.data.DatabaseManager;

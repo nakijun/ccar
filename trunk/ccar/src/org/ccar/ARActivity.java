@@ -4,7 +4,6 @@ import java.text.DecimalFormat;
 import java.util.List;
 import java.util.concurrent.RejectedExecutionException;
 
-import org.ccar.R;
 import org.ccar.app.CCARApplication;
 import org.ccar.app.GeoCalcUtil;
 import org.ccar.ar.ARData;
