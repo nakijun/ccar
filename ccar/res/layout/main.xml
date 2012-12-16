@@ -1,40 +1,142 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="horizontal"
-    android:padding="30dip"
+    android:orientation="vertical"
+    android:padding="0dip"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
-    <LinearLayout 
-        android:orientation="vertical"
+    <FrameLayout 
+    	android:layout_width="fill_parent"
+        android:layout_height="50dip"
+        android:background="@drawable/background_header" >
+    	<TextView 
+	    	android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+		    android:layout_gravity="center"
+		    android:textSize="24.5sp"
+		    android:textColor="#ffffff"
+		    android:text="@string/index"/>
+    </FrameLayout>
+
+    <LinearLayout
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center">
-        <TextView 
-            android:layout_width="wrap_content"
-	    	android:layout_height="wrap_content"
-	    	android:layout_gravity="center"
-	    	android:layout_marginBottom="25dip"
-	    	android:textSize="24.5sp"
-	    	android:text="@string/index"/>
-		<Button android:id="@+id/spotlist_button"
-		    android:layout_width="fill_parent"
-		    android:layout_height="wrap_content"
-		    android:text="@string/spotlist"/>
-		<Button android:id="@+id/ar_button"
-		    android:layout_width="fill_parent"
-		    android:layout_height="wrap_content"
-		    android:text="@string/AR"/>
-		<Button android:id="@+id/navigation_button"
-		    android:layout_width="fill_parent"
-		    android:layout_height="wrap_content"
-		    android:text="@string/navigation"/>
-		<Button android:id="@+id/exit_button"
-		    android:layout_width="fill_parent"
-		    android:layout_height="wrap_content"
-		    android:text="@string/exit"/>
+        android:layout_height="fill_parent"
+        android:layout_weight="2"
+        android:background="@drawable/cangshulou"
+        android:gravity="bottom"
+        android:orientation="vertical"
+        android:padding="8dp" >
+
+    	<LinearLayout
+    	    android:layout_width="fill_parent"
+    	    android:layout_height="wrap_content"
+    	    android:background="@drawable/background_spotinfo_index"
+    	    android:gravity="left"
+    	    android:orientation="vertical"
+    	    android:paddingLeft="8dp"
+    	    android:paddingRight="8dp"
+    	    android:paddingTop="5dp"
+    	    android:paddingBottom="5dp">
+			<TextView android:id="@+id/index_spotname"
+			    android:layout_width="fill_parent"
+			    android:layout_height="wrap_content"
+			    android:textSize="18sp"
+			    android:textColor="#ffffff"
+			    android:text="藏书楼"/>
+			<TextView android:id="@+id/index_spotinfo"
+			    android:layout_width="fill_parent"
+			    android:layout_height="wrap_content"
+			    android:textSize="14sp"
+			    android:textColor="#ffffff"
+			    android:text="荷花、桃花、竹子，谓之连理三瑞，洪皓筑堂，名之“三瑞堂”。洪钟曾孙洪楩在西溪湿地构筑藏书楼，亦以“三瑞堂”名之。"/>
+		</LinearLayout>
     </LinearLayout>
-	
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="92dip"
+        android:background="@drawable/background_button_index"
+        android:padding="5dip"
+        android:orientation="horizontal" >
+    	<LinearLayout 
+    	    android:layout_width="fill_parent"
+    	    android:layout_height="wrap_content"
+    	    android:layout_weight="0.25"
+    	    android:orientation="vertical"
+    	    android:gravity="center_horizontal"
+    	    android:background="#101010">
+	    	<ImageButton android:id="@+id/imgbtn_home"
+	    	    android:contentDescription="Home"
+			    android:src="@drawable/index_home_down"
+			    android:layout_width="fill_parent"
+			    android:layout_height="wrap_content"
+			    android:padding="0dp"
+			    android:background="#00000000"/>
+	    	<TextView 
+	    	    android:layout_width="fill_parent"
+	    	    android:layout_height="wrap_content"
+	    	    android:gravity="center_horizontal"
+	    	    android:textColor="#ffffff"
+	    	    android:text="首页"/>
+    	</LinearLayout>
+    	<LinearLayout 
+    	    android:layout_width="fill_parent"
+    	    android:layout_height="wrap_content"
+    	    android:layout_weight="0.25"
+    	    android:orientation="vertical"
+    	    android:gravity="center_horizontal">
+			<ImageButton android:id="@+id/imgbtn_spotlist"
+			    android:src="@drawable/index_spotlist_up"
+			    android:layout_width="fill_parent"
+			    android:layout_height="wrap_content"
+			    android:padding="0dp"
+			    android:background="#00000000"/>
+			<TextView 
+	    	    android:layout_width="fill_parent"
+	    	    android:layout_height="wrap_content"
+	    	    android:gravity="center_horizontal"
+	    	    android:textColor="#ffffff"
+	    	    android:text="地点探索"/>
+		</LinearLayout>
+		<LinearLayout 
+    	    android:layout_width="fill_parent"
+    	    android:layout_height="wrap_content"
+    	    android:layout_weight="0.25"
+    	    android:orientation="vertical"
+    	    android:gravity="center_horizontal">
+			<ImageButton android:id="@+id/imgbtn_ar"
+			    android:src="@drawable/index_ar_up"
+			    android:layout_width="fill_parent"
+			    android:layout_height="wrap_content"
+			    android:padding="0dp"
+			    android:background="#00000000"/>
+			<TextView 
+	    	    android:layout_width="fill_parent"
+	    	    android:layout_height="wrap_content"
+	    	    android:gravity="center_horizontal"
+	    	    android:textColor="#ffffff"
+	    	    android:text="增强现实"/>
+		</LinearLayout>
+		<LinearLayout 
+    	    android:layout_width="fill_parent"
+    	    android:layout_height="wrap_content"
+    	    android:layout_weight="0.25"
+    	    android:orientation="vertical"
+    	    android:gravity="center_horizontal">
+			<ImageButton android:id="@+id/imgbtn_navigation"
+			    android:src="@drawable/index_navigation_up"
+			    android:layout_width="fill_parent"
+			    android:layout_height="wrap_content"
+			    android:padding="0dp"
+			    android:background="#00000000"/>
+			<TextView 
+	    	    android:layout_width="fill_parent"
+	    	    android:layout_height="wrap_content"
+	    	    android:gravity="center_horizontal"
+	    	    android:textColor="#ffffff"
+	    	    android:text="景区导航"/>
+		</LinearLayout>
+    </LinearLayout>
     
 </LinearLayout>
 

@@ -5,7 +5,7 @@
     android:layout_gravity="center_vertical"
     android:orientation="horizontal"
     android:paddingLeft="10dip" android:paddingRight="10dip"
-    android:paddingTop="1dip" android:paddingBottom="1dip">
+    android:paddingTop="1dip" android:paddingBottom="1dip">"
     <TextView android:id="@+id/spotcatalog_name"
         android:layout_width="200dip" 
         android:layout_height="wrap_content"
