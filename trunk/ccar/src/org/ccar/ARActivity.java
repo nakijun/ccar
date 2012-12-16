@@ -151,8 +151,8 @@ public class ARActivity extends AugmentedActivity {
 				return;
 			}
 
-//			double[] xy = GeoCalcUtil.WGS2flat(lon, lat);
-			double[] xy = GeoCalcUtil.WGS2flat(lon - 0.017639, lat - 0.016728);
+			double[] xy = GeoCalcUtil.WGS2flat(lon, lat);
+//			double[] xy = GeoCalcUtil.WGS2flat(lon - 0.077639, lat - 0.008553);
 			List<Marker> markers = localData.getMarkers(dm, xy[0], xy[1],
 					ARData.getRadius());
 			ARData.addMarkers(markers);
