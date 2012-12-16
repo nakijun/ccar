@@ -13,6 +13,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.ImageButton;
 
 /**
  * 主页
@@ -21,10 +22,10 @@ import android.widget.Button;
  * 
  */
 public class MainActivity extends Activity implements OnClickListener {
-	Button btnSpotlist; // “景点列表”按钮
-	Button btnAR; // “增强现实”按钮
-	Button btnNavigation; // “景区导航”按钮
-	Button btnExit; // “退出”按钮
+	ImageButton btnSpotlist; // “景点列表”按钮
+	ImageButton btnAR; // “增强现实”按钮
+	ImageButton btnNavigation; // “景区导航”按钮
+//	Button btnExit; // “退出”按钮
 
 	/** Called when the activity is first created. */
 	@Override
@@ -74,21 +75,21 @@ public class MainActivity extends Activity implements OnClickListener {
 	public void onClick(View v) {
 		Intent i;
 		switch (v.getId()) {
-		case R.id.spotlist_button:
+		case R.id.imgbtn_spotlist:
 			i = new Intent(this, SpotCatalogActivity.class);
 			startActivity(i);
 			break;
-		case R.id.ar_button:
+		case R.id.imgbtn_ar:
 			i = new Intent(this, ARActivity.class);
 			startActivity(i);
 			break;
-		case R.id.navigation_button:
+		case R.id.imgbtn_navigation:
 			i = new Intent(this, NavigationActivity.class);
 			startActivity(i);
 			break;
-		case R.id.exit_button:
-			exitApp();
-			break;
+//		case R.id.exit_button:
+//			exitApp();
+//			break;
 		default:
 			break;
 		}
@@ -109,14 +110,14 @@ public class MainActivity extends Activity implements OnClickListener {
 	 * 设置各按钮的监听器
 	 */
 	private void setListener() {
-		btnSpotlist = (Button) findViewById(R.id.spotlist_button);
+		btnSpotlist = (ImageButton) findViewById(R.id.imgbtn_spotlist);
 		btnSpotlist.setOnClickListener(this);
-		btnAR = (Button) findViewById(R.id.ar_button);
+		btnAR = (ImageButton) findViewById(R.id.imgbtn_ar);
 		btnAR.setOnClickListener(this);
-		btnNavigation = (Button) findViewById(R.id.navigation_button);
+		btnNavigation = (ImageButton) findViewById(R.id.imgbtn_navigation);
 		btnNavigation.setOnClickListener(this);
-		btnExit = (Button) findViewById(R.id.exit_button);
-		btnExit.setOnClickListener(this);
+//		btnExit = (Button) findViewById(R.id.exit_button);
+//		btnExit.setOnClickListener(this);
 	}
 
 	/**
